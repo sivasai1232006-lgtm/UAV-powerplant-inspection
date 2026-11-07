@@ -1,0 +1,4 @@
+string task_id
+geometry_msgs/Point target_position
+int32 priority
+float32 estimated_duration

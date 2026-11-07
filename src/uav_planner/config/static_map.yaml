@@ -1,0 +1,13 @@
+flight_altitude: 10.0
+flight_altitudes: [8.0, 10.0]
+resolution: 0.25
+uav_safety_radius: 0.5
+additional_clearance: 0.25
+x_min: -40.0
+x_max: 45.0
+y_min: -70.0
+y_max: 40.0
+world_frame: map
+occupied_value: 100
+free_value: 0
+unknown_value: -1

@@ -1,0 +1,7 @@
+string task_id
+string uav_id
+float64 outbound_distance_m
+float64 return_distance_m
+---
+bool success
+string message

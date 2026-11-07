@@ -1,0 +1,6 @@
+string task_id
+string current_uav_id
+string new_uav_id
+---
+bool success
+string message

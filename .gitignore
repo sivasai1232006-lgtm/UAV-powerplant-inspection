@@ -1,0 +1,48 @@
+
+# ROS 2 / Colcon build artifacts
+build/
+install/
+log/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Python virtual environments
+venv/
+.venv/
+env/
+
+# Generated files
+*.so
+*.o
+*.a
+*.pyc
+
+# ROS generated files
+*.db3
+*.mcap
+*.bag
+
+# IDE and editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/tasks.json
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# Coverage
+.coverage
+htmlcov/

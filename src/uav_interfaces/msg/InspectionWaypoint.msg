@@ -1,0 +1,4 @@
+string waypoint_id
+geometry_msgs/Pose target_pose
+float32 inspection_duration
+float32 acceptance_radius

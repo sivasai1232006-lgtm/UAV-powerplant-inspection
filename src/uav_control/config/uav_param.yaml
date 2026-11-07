@@ -1,0 +1,23 @@
+/uav_1/offboard_controller:
+  ros__parameters:
+    target_x: 0.0
+    target_y: 0.0
+    target_z: -3.0
+    target_yaw: 0.0
+    target_system: 2
+    start_enabled: true
+    home_map_x: -5.0
+    home_map_y: 0.0
+    home_map_z: 0.2
+
+/uav_2/offboard_controller:
+  ros__parameters:
+    target_x: 0.0      # 15 m north of spawn
+    target_y: 0.0
+    target_z: -3.0
+    target_yaw: 0.0
+    target_system: 3
+    start_enabled: true 
+    home_map_x: 5.0
+    home_map_y: 0.0
+    home_map_z: 0.2

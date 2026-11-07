@@ -1,0 +1,10 @@
+geometry_msgs/PoseStamped target_pose
+float32 acceptance_radius
+float32 max_velocity
+---
+bool success
+string message
+geometry_msgs/PoseStamped final_pose
+---
+float32 distance_remaining
+float32 progress

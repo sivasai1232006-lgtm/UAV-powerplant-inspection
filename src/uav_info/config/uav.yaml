@@ -1,0 +1,32 @@
+/**:
+  ros__parameters:
+    uav.id: uav_1
+
+    frames.world: map
+    frames.local: odom
+    frames.body: base_link
+
+    topics.global_position: fmu/out/vehicle_global_position
+    topics.local_position: fmu/out/vehicle_local_position_v1
+    topics.attitude: fmu/out/vehicle_attitude
+    topics.angular_velocity: ''
+    topics.battery_status: fmu/out/battery_status_v1
+    topics.vehicle_status: fmu/out/vehicle_status_v4
+    topics.land_detected: fmu/out/vehicle_land_detected
+    topics.path_distance: path_distance
+
+    coordinate_transform.reference_latitude: 47.397971057728974
+    coordinate_transform.reference_longitude: 8.546163739800146
+    coordinate_transform.reference_altitude: 0.0
+
+    battery.model: linear_distance
+    battery.initial_percentage: 100.0
+    battery.consumption_per_meter: 0.05
+    battery.minimum_reserve_percentage: 20.0
+
+    altitude.minimum: 2.0
+    altitude.maximum: 30.0
+
+    health.telemetry_timeout: 2.0
+
+    telemetry.publish_rate: 5.0

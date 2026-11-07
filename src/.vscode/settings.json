@@ -1,0 +1,19 @@
+{
+    "cmake.sourceDirectory": "/home/siva/uav_project_me762/src/uav_sim",
+    "python.envs.defaultEnvManager": "ms-python.python:system",
+    "python.defaultInterpreterPath": "/usr/bin/python3",
+    "python.analysis.extraPaths": [
+        "/home/siva/uav_project_me762/src/uav_allocator",
+        "/home/siva/uav_project_me762/src/uav_mission",
+        "/home/siva/uav_project_me762/src/uav_info",
+        "/home/siva/uav_project_me762/install/uav_interfaces/local/lib/python3.10/dist-packages",
+        "/home/siva/uav_project_me762/install/px4_msgs/local/lib/python3.10/dist-packages",
+        "/home/siva/uav_project_me762/install/uav_allocator/lib/python3.10/site-packages",
+        "/home/siva/uav_project_me762/install/uav_mission/lib/python3.10/site-packages",
+        "/home/siva/uav_project_me762/install/uav_info/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages"
+    ],
+    "python.analysis.useLibraryCodeForTypes": true,
+    "python-envs.defaultEnvManager": "ms-python.python:system"
+}

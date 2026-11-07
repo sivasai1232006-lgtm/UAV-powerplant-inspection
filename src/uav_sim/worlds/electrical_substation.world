@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.11">
+  <world name="powerplant">
+
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <physics type='ode'>
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+    <plugin name='gz::sim::systems::Physics' filename='libgz-sim-physics-system.so'/>
+    <plugin name='gz::sim::systems::UserCommands' filename='libgz-sim-user-commands-system.so'/>
+    <plugin name='gz::sim::systems::SceneBroadcaster' filename='libgz-sim-scene-broadcaster-system.so'/>
+    <plugin name="gz::sim::systems::Sensors" filename="libgz-sim-sensors-system.so">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin name="gz::sim::systems::Imu" filename="libgz-sim-imu-system.so"/>
+    <plugin filename="gz-sim-air-pressure-system" name="gz::sim::systems::AirPressure"/>
+    <plugin filename="gz-sim-magnetometer-system" name="gz::sim::systems::Magnetometer"/>
+    <plugin name="gz::sim::systems::NavSat" filename="libgz-sim-navsat-system.so"/>
+
+    <light name="sun" type="directional">
+      <cast_shadows>true</cast_shadows>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.5 -1</direction>
+    </light>
+    
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>47.397971057728974</latitude_deg>
+      <longitude_deg>8.546163739800146</longitude_deg>
+      <elevation>0</elevation>
+    </spherical_coordinates>
+
+    <model name="ground_plane">
+        <static>true</static>
+        <link name="link">
+            <collision name="collision">
+            <geometry>
+                <plane>
+                <normal>0 0 1</normal>
+                </plane>
+            </geometry>
+            </collision>
+            <visual name="visual">
+            <geometry>
+                <plane>
+                <normal>0 0 1</normal>
+                <size>500 500</size>
+                </plane>
+            </geometry>
+            <material>
+                <ambient>0.8 0.8 0.8 1</ambient>
+                <diffuse>0.8 0.8 0.8 1</diffuse>
+                <specular>0.8 0.8 0.8 1</specular>
+            </material>
+            </visual>
+        </link>
+    </model>
+
+    <!-- Local station components (ensure model.config <name> matches) -->
+    <include>
+      <name>station_base</name>
+      <pose>-40.9745 -35.2897 -0.08 0 -0 0</pose>
+      <uri>model://uav_sim/models/station_base</uri>
+    </include>
+
+
+    <include>
+      <name>station_fence</name>
+      <pose>-40.9731 10.5303 0 0 -0 0</pose>
+      <uri>model://uav_sim/models/station_fence</uri>
+    </include>
+
+    <!-- Electrical stuff parts -->
+    <include>
+      <name>station_electrical_stuff_part_1</name>
+      <pose>7.31381 -28.5644 0 0 -0 0</pose>
+      <uri>model://uav_sim/models/station_electrical_stuff_part_1</uri>
+    </include>
+    <include>
+      <name>station_electrical_stuff_part_2</name>
+      <pose>7.31332 -28.5641 0 0 0 0</pose>
+      <uri>model://uav_sim/models/station_electrical_stuff_part_2</uri>
+    </include>
+    <include>
+      <name>station_electrical_stuff_part_3</name>
+      <pose>7.31332 -28.5641 0 0 0 0</pose>
+      <uri>model://uav_sim/models/station_electrical_stuff_part_3</uri>
+    </include>
+    <include>
+      <name>station_electrical_stuff_part_4</name>
+      <pose>7.31332 -28.5641 0 0 0 0</pose>
+      <uri>model://uav_sim/models/station_electrical_stuff_part_4</uri>
+    </include>
+    <include>
+      <name>station_electrical_stuff_part_5</name>
+      <pose>7.31332 -28.5641 0 0 0 0</pose>
+      <uri>model://uav_sim/models/station_electrical_stuff_part_5</uri>
+    </include>
+    <include>
+      <name>station_electrical_stuff_part_6</name>
+      <pose>7.31332 -28.5641 0 0 0 0</pose>
+      <uri>model://uav_sim/models/station_electrical_stuff_part_6</uri>
+    </include>
+    <include>
+      <name>station_electrical_stuff_part_7</name>
+      <pose>7.31332 -28.5641 0 0 0 0</pose>
+      <uri>model://uav_sim/models/station_electrical_stuff_part_7</uri>
+    </include>
+
+    <include>
+      <uri>model://uav_sim/models/powerplant_assembly</uri>
+      <name>powerplant_assembly_1</name>
+      <pose>15 10 -2.2 0 0 1.5707963</pose>
+    </include>
+
+    <!-- GUI camera optional -->
+    <gui fullscreen="false">
+      <camera name="user_camera">
+        <pose>155.407 -58.3221 238.768 0 0.957798 2.776</pose>
+      </camera>
+    </gui>
+
+  </world>
+</sdf>

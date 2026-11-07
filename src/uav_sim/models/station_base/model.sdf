@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<sdf version="1.11">
+  <model name="station_base">
+    <static>true</static>
+    <allow_auto_disable>true</allow_auto_disable>
+
+    <link name="link_0">
+      <pose>-0.000001 0 0 0 0 0</pose>
+
+      <inertial>
+        <mass>1</mass>
+        <inertia>
+          <ixx>0.166667</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>0.166667</iyy><iyz>0</iyz><izz>0.166667</izz>
+        </inertia>
+        <pose>0 0 0 0 0 0</pose>
+      </inertial>
+
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <kinematic>false</kinematic>
+      <enable_wind>false</enable_wind>
+
+      <visual name="visual">
+        <!-- Mantengo la rotación 90° (roll) si el STL necesita ponerse vertical -->
+        <pose>0 0 0 1.57079 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>meshes/station_base.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <specular>0.01 0.01 0.01 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+        <cast_shadows>true</cast_shadows>
+      </visual>
+      <collision name="collision">
+        <pose>0 0 0 1.57079 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>meshes/station_base.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,35 @@
+/**:
+  ros__parameters:
+    use_sim_time: true
+    uav_ids: [uav_1, uav_2]
+    topics.uav_state: /{uav_id}/uav_state
+    topics.odometry: /{uav_id}/odom
+    topics.battery: /{uav_id}/battery/measured
+    get_unassigned_tasks_service: /mission_manager/get_unassigned_tasks
+    assign_task_service: /mission_manager/assign_task
+    planning_frame: map
+
+    nominal_speed_mps: 3.0
+    state_timeout_sec: 3.0
+    auction_retry_interval_sec: 1.0
+
+    # Keep aligned with uav_info/config/uav.yaml until a shared parameter source exists.
+    battery_consumption_per_meter: 0.05
+    inspection_consumption_per_minute: 0.25
+    minimum_battery_reserve_percentage: 20.0
+
+    base_positions:
+      uav_1: [-5.0, 0.0, 3.2]
+      uav_2: [5.0, 0.0, 3.2]
+
+    cost:
+      weights:
+        distance: 0.4
+        time: 0.25
+        energy: 0.25
+        priority: 0.1
+      distance_scale_m: 100.0
+      time_scale_sec: 300.0
+      energy_scale_percentage: 10.0
+      minimum_priority: 1
+      maximum_priority: 5

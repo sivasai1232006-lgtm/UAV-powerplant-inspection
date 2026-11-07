@@ -1,0 +1,45 @@
+
+mission:
+  name: powerplant_inspection
+  frame_id: map
+
+  uavs:
+    - id: uav_1
+      start_position: [-5.0, 0.0, 0.0]
+      home_position: [-5.0, 0.0, 3.2]
+      battery_remaining: 100.0
+
+    - id: uav_2
+      start_position: [5.0, 0.0, 0.0]
+      home_position: [5.0, 0.0, 3.2]
+      battery_remaining: 100.0
+
+  constraints:
+    minimum_battery_percent: 20.0
+    minimum_separation_m: 3.0
+    maximum_altitude_m: 30.0
+
+  tasks:
+    - id: EQUIPMENT_COMPLEX_NORTH_VIEW
+      type: inspection
+      waypoint: [-9.469, 12.645, 10.0]
+      priority: 1
+      estimated_duration_s: 45.0
+
+    - id: EQUIPMENT_COMPLEX_SOUTH_VIEW
+      type: inspection
+      waypoint: [-9.469, -62.478, 10.0]
+      priority: 1
+      estimated_duration_s: 45.0
+
+    - id: EQUIPMENT_COMPLEX_WEST_VIEW
+      type: inspection
+      waypoint: [-31.25, -24.917, 10.0]
+      priority: 1
+      estimated_duration_s: 45.0
+
+    - id: EQUIPMENT_COMPLEX_EAST_VIEW
+      type: inspection
+      waypoint: [12.313, -24.917, 10.0]
+      priority: 1
+      estimated_duration_s: 45.0
