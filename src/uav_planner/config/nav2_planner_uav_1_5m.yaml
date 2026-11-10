@@ -1,60 +1,49 @@
-/planner_8m/planner_server:
+/uav_1/planner_5m/planner_server:
   ros__parameters:
     use_sim_time: true
     expected_planner_frequency: 5.0
     planner_plugins: [GridBased]
     GridBased:
       plugin: nav2_smac_planner/SmacPlannerHybrid
-      tolerance: 0.25
+      motion_model_for_search: DUBIN
+      angle_quantization_bins: 72
+      minimum_turning_radius: 0.4
+      tolerance: 1.0
       downsample_costmap: true
       downsampling_factor: 2
       allow_unknown: false
       max_iterations: 100000
       max_on_approach_iterations: 1000
       max_planning_time: 2.0
-      motion_model_for_search: DUBIN
-      angle_quantization_bins: 72
-      minimum_turning_radius: 0.5
-      analytic_expansion_ratio: 3.5
-      lookup_table_size: 20.0
-      cache_obstacle_heuristic: true
-      smooth_path: true
+      cost_travel_multiplier: 2.0
+      use_final_approach_orientation: true
 
-/planner_8m/global_costmap/global_costmap:
+/uav_1/planner_5m/global_costmap/global_costmap:
   ros__parameters:
       use_sim_time: true
       global_frame: map
       # The static costmap plans from explicit map-frame action start poses.
-      robot_base_frame: map
+      robot_base_frame: uav_1/base_link
       update_frequency: 2.0
       publish_frequency: 1.0
       resolution: 0.25
       track_unknown_space: false
       rolling_window: false
-      width: 340
-      height: 440
-      origin_x: -40.0
-      origin_y: -70.0
+      width: 240
+      height: 640
+      origin_x: -45.0
+      origin_y: -80.0
       robot_radius: 0.5
       plugins: [static_layer, obstacle_layer, inflation_layer]
       static_layer:
         plugin: nav2_costmap_2d::StaticLayer
+        map_topic: /uav_1/planner_5m/map
         map_subscribe_transient_local: true
       obstacle_layer:
         plugin: nav2_costmap_2d::ObstacleLayer
-        observation_sources: uav_1_scan uav_2_scan
+        observation_sources: uav_1_scan
         uav_1_scan:
-          topic: /planner_8m/uav_1/scan
-          data_type: LaserScan
-          marking: true
-          clearing: true
-          obstacle_max_range: 30.0
-          raytrace_max_range: 30.0
-          max_obstacle_height: 30.0
-          observation_persistence: 0.5
-          expected_update_rate: 0.0
-        uav_2_scan:
-          topic: /planner_8m/uav_2/scan
+          topic: /planner_5m/uav_1/scan
           data_type: LaserScan
           marking: true
           clearing: true
@@ -65,6 +54,5 @@
           expected_update_rate: 0.0
       inflation_layer:
         plugin: nav2_costmap_2d::InflationLayer
-        inflation_radius: 0.75
-        cost_scaling_factor: 3.0
-
+        inflation_radius: 0.65
+        cost_scaling_factor: 4.0

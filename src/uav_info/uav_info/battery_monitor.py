@@ -34,7 +34,11 @@ class BatteryMonitor:
             minimum_reserve_percentage
         )
         self.cumulative_distance_m = 0.0
+        self.reported_distance_m = 0.0
+        self.distance_offset_m = 0.0
         self.has_path_distance = False
+        self.measured_percentage = None
+        self.distance_at_measured_percentage_m = 0.0
 
     def update_path_distance(self, cumulative_distance_m):
         if (
@@ -42,16 +46,43 @@ class BatteryMonitor:
             or cumulative_distance_m < 0.0
         ):
             return False
-        if cumulative_distance_m < self.cumulative_distance_m:
-            return False
-
-        self.cumulative_distance_m = float(cumulative_distance_m)
+        reported_distance_m = float(cumulative_distance_m)
+        if reported_distance_m < self.reported_distance_m:
+            # The mission manager's counter restarts with its process. Keep
+            # the already accumulated distance as an offset for the new run.
+            self.distance_offset_m += self.reported_distance_m
+        self.reported_distance_m = reported_distance_m
+        self.cumulative_distance_m = (
+            self.distance_offset_m + reported_distance_m
+        )
         self.has_path_distance = True
         return True
 
+    def update_measured_percentage(self, percentage):
+        """Calibrate the distance estimate from this UAV's fresh telemetry."""
+        try:
+            percentage = float(percentage)
+        except (TypeError, ValueError):
+            return False
+        if not math.isfinite(percentage) or not 0.0 <= percentage <= 100.0:
+            return False
+        self.measured_percentage = percentage
+        self.distance_at_measured_percentage_m = self.cumulative_distance_m
+        return True
+
     def estimated_percentage(self):
-        consumed = self.consumption_per_meter * self.cumulative_distance_m
-        return max(0.0, self.initial_percentage - consumed)
+        if self.measured_percentage is None:
+            reference_percentage = self.initial_percentage
+            distance_since_reference = self.cumulative_distance_m
+        else:
+            reference_percentage = self.measured_percentage
+            distance_since_reference = max(
+                0.0,
+                self.cumulative_distance_m
+                - self.distance_at_measured_percentage_m,
+            )
+        consumed = self.consumption_per_meter * distance_since_reference
+        return max(0.0, reference_percentage - consumed)
 
     def estimated_range_m(self):
         if self.consumption_per_meter == 0.0:

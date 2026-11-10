@@ -1,2 +1,6 @@
 ---
 uav_interfaces/Task[] tasks
+uav_interfaces/Task[] assigned_tasks
+string[] assigned_uav_ids
+bool[] assigned_tasks_inspecting
+float64[] remaining_inspection_sec

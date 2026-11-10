@@ -3,11 +3,22 @@ import math
 from uav_info import coordinates
 
 gps_to_gazebo_enu = coordinates.gps_to_gazebo_enu
+local_enu_to_map_rotation = coordinates.local_enu_to_map_rotation
+local_origin_to_map = coordinates.local_origin_to_map
+local_ned_to_map = coordinates.local_ned_to_map
+map_to_local_ned = coordinates.map_to_local_ned
+rotation_matrix_to_quaternion = coordinates.rotation_matrix_to_quaternion
+local_enu_yaw_in_map = coordinates.local_enu_yaw_in_map
 
 
 def ned_to_enu(vector):
     north, east, down = vector
     return east, north, -down
+
+
+def enu_to_ned(vector):
+    east, north, up = vector
+    return north, east, -up
 
 
 def frd_to_flu(vector):

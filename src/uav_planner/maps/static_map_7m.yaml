@@ -1,0 +1,10 @@
+image: static_map_7m.pgm
+resolution: 0.25
+origin:
+- -45.0
+- -80.0
+- 0.0
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.25
+mode: scale

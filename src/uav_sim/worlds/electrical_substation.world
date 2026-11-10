@@ -6,8 +6,9 @@
     <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
     <physics type='ode'>
       <max_step_size>0.004</max_step_size>
-      <real_time_factor>1.0</real_time_factor>
-      <real_time_update_rate>250</real_time_update_rate>
+      <real_time_factor>2.0</real_time_factor>
+      <!-- 500 Hz permits 2x real time at the existing 4 ms physics step. -->
+      <real_time_update_rate>500</real_time_update_rate>
     </physics>
     <plugin name='gz::sim::systems::Physics' filename='libgz-sim-physics-system.so'/>
     <plugin name='gz::sim::systems::UserCommands' filename='libgz-sim-user-commands-system.so'/>

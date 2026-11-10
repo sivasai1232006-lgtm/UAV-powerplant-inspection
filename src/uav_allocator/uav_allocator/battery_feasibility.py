@@ -16,11 +16,13 @@ class BatteryFeasibility:
         consumption_per_meter,
         inspection_consumption_per_minute,
         minimum_reserve_percentage,
+        landing_energy_percentage=2.0,
     ):
         values = (
             consumption_per_meter,
             inspection_consumption_per_minute,
             minimum_reserve_percentage,
+            landing_energy_percentage,
         )
         if any(not math.isfinite(value) or value < 0.0 for value in values):
             raise ValueError('Battery model values cannot be negative')
@@ -33,6 +35,7 @@ class BatteryFeasibility:
         self.minimum_reserve_percentage = float(
             minimum_reserve_percentage
         )
+        self.landing_energy_percentage = float(landing_energy_percentage)
 
     def evaluate(
         self,
@@ -67,11 +70,13 @@ class BatteryFeasibility:
             + inspection_duration_sec / 60.0
             * self.inspection_consumption_per_minute
             + self.minimum_reserve_percentage
+            + self.landing_energy_percentage
         )
         available = float(battery_percentage)
         feasible = 0.0 <= available <= 100.0 and available >= required
         reason = (
-            'battery sufficient for outbound, inspection, return, and reserve'
+            'battery sufficient for outbound, inspection, return, landing, '
+            'and reserve'
             if feasible
             else f'requires {required:.2f}% battery, has {available:.2f}%'
         )

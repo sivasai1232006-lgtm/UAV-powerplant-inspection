@@ -12,9 +12,16 @@ class CostFunction:
         maximum_priority,
     ):
         self.weights = dict(weights)
-        if set(self.weights) != {'distance', 'time', 'energy', 'priority'}:
+        required_weights = {
+            'distance', 'time', 'energy', 'priority',
+        }
+        optional_weights = {'battery', 'workload', 'future'}
+        if not required_weights.issubset(self.weights) or not set(
+            self.weights
+        ).issubset(required_weights | optional_weights):
             raise ValueError(
-                'Weights must define distance, time, energy, priority'
+                'Weights must define distance, time, energy, priority and may '
+                'define battery, workload, future'
             )
         if any(not math.isfinite(value) or value < 0.0
                for value in self.weights.values()):
@@ -32,14 +39,25 @@ class CostFunction:
         self.minimum_priority = int(minimum_priority)
         self.maximum_priority = int(maximum_priority)
 
-    def calculate(self, distance_m, duration_sec, energy_percentage,
-                  priority):
+    def calculate(
+        self,
+        distance_m,
+        duration_sec,
+        energy_percentage,
+        priority,
+        battery_penalty=0.0,
+        workload_penalty=0.0,
+        future_penalty=0.0,
+    ):
         priority_value = min(
             self.maximum_priority,
             max(self.minimum_priority, int(priority)),
         )
+        # Higher-priority work uses a numerically smaller priority value.
+        # Keep the penalty monotonic with that ordering so 1 is preferred
+        # over 5 instead of the reverse.
         priority_penalty = (
-            self.maximum_priority - priority_value
+            priority_value - self.minimum_priority
         ) / (self.maximum_priority - self.minimum_priority)
         return (
             self.weights['distance'] * distance_m / self.distance_scale_m
@@ -47,4 +65,7 @@ class CostFunction:
             + self.weights['energy'] * energy_percentage
             / self.energy_scale_percentage
             + self.weights['priority'] * priority_penalty
+            + self.weights.get('battery', 0.0) * battery_penalty
+            + self.weights.get('workload', 0.0) * workload_penalty
+            + self.weights.get('future', 0.0) * future_penalty
         )

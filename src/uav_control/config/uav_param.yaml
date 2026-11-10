@@ -6,9 +6,11 @@
     target_yaw: 0.0
     target_system: 2
     start_enabled: true
-    home_map_x: -5.0
-    home_map_y: 0.0
-    home_map_z: 0.2
+    horizontal_velocity_multiplier: 1.2
+    forward_speed_multiplier: 1.5
+    max_velocity_limit: 5.0
+    map.frame_id: map
+    telemetry_timeout_sec: 2.0
 
 /uav_2/offboard_controller:
   ros__parameters:
@@ -18,6 +20,8 @@
     target_yaw: 0.0
     target_system: 3
     start_enabled: true 
-    home_map_x: 5.0
-    home_map_y: 0.0
-    home_map_z: 0.2
+    horizontal_velocity_multiplier: 1.2
+    forward_speed_multiplier: 1.5
+    max_velocity_limit: 5.0
+    map.frame_id: map
+    telemetry_timeout_sec: 2.0

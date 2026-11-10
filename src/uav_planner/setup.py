@@ -18,6 +18,7 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     entry_points={'console_scripts': [
-        'generate_static_map = uav_planner.grid_exporter:main',
+        'grid_exporter = uav_planner.grid_exporter:main',
+        'altitude_map_fuser = uav_planner.map_fuser:main',
     ]},
 )

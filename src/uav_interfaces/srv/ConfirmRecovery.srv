@@ -1,0 +1,5 @@
+string uav_id
+bool ready
+---
+bool success
+string message
