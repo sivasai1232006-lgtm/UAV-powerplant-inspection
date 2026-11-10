@@ -15,11 +15,12 @@
       </visual>
       
       <collision name="assembly_collision">
-        <pose>0 0 0 0 0 0</pose>
         <geometry>
-          <box>
-            <size>10 5 4</size>
-          </box>
+          <mesh>
+            <uri>meshes/powerplant.stl</uri>
+            <!-- The exported DAE visual is 0.16 m taller than the STL. -->
+            <scale>1 1 1.01</scale>
+          </mesh>
         </geometry>
       </collision>
     </link>

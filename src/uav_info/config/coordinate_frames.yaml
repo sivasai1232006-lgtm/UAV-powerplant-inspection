@@ -1,0 +1,7 @@
+/**:
+  ros__parameters:
+    map.frame_id: map
+    # WGS84 origin and ENU axes are the Gazebo spherical_coordinates origin.
+    map.reference_latitude: 47.397971057728974
+    map.reference_longitude: 8.546163739800146
+    map.reference_altitude: 0.0

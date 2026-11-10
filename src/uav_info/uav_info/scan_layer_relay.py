@@ -7,15 +7,34 @@ from rclpy.qos import QoSProfile, ReliabilityPolicy
 from sensor_msgs.msg import LaserScan
 
 
+FLIGHT_ALTITUDES_M = (3, 5, 7, 10)
+
+
+def planner_scan_topics(uav_id):
+    return {
+        altitude: f'/planner_{altitude}m/{uav_id}/scan'
+        for altitude in FLIGHT_ALTITUDES_M
+    }
+
+
 class ScanLayerRelay(Node):
     def __init__(self):
         super().__init__('scan_layer_relay')
         self.declare_parameter('uav_id', '')
         self.declare_parameter('altitude_clearance', 0.9)
-        self.uav_id = str(self.get_parameter('uav_id').value)
-        self.altitude_clearance = float(
-            self.get_parameter('altitude_clearance').value
-        )
+        uav_id = self.get_parameter('uav_id').value
+        if not isinstance(uav_id, str) or not uav_id:
+            raise ValueError('uav_id must be a non-empty string')
+        self.uav_id = uav_id
+        altitude_clearance = self.get_parameter('altitude_clearance').value
+        if (
+            not isinstance(altitude_clearance, (int, float))
+            or isinstance(altitude_clearance, bool)
+        ):
+            raise ValueError('altitude_clearance must be numeric')
+        self.altitude_clearance = float(altitude_clearance)
+        if self.altitude_clearance < 0.0:
+            raise ValueError('altitude_clearance cannot be negative')
         self.altitude = None
         scan_qos = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
@@ -29,11 +48,10 @@ class ScanLayerRelay(Node):
         )
         self.scan_publishers = {
             altitude: self.create_publisher(
-                LaserScan,
-                f'/planner_{altitude}m/{self.uav_id}/scan',
+                LaserScan, topic,
                 scan_qos,
             )
-            for altitude in (8, 10)
+            for altitude, topic in planner_scan_topics(self.uav_id).items()
         }
 
     def _odometry_callback(self, message):

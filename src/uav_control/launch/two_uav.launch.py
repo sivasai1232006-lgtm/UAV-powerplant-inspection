@@ -11,6 +11,11 @@ def generate_launch_description():
         'config',
         'uav_param.yaml',
     )
+    frames_file = os.path.join(
+        get_package_share_directory('uav_info'),
+        'config',
+        'coordinate_frames.yaml',
+    )
 
     controllers = [
         Node(
@@ -18,7 +23,11 @@ def generate_launch_description():
             executable='controller',      # name from setup.py console_scripts
             namespace=ns,
             name='offboard_controller',   # same name used in super().__init__()
-            parameters=[params_file, {'use_sim_time': True}],
+            parameters=[
+                params_file,
+                frames_file,
+                {'use_sim_time': True},
+            ],
             output='screen',
         )
         for ns in ('uav_1', 'uav_2')

@@ -1,4 +1,6 @@
 string task_id
+string frame_id
 geometry_msgs/Point target_position
 int32 priority
 float32 estimated_duration
+float32 object_height_m

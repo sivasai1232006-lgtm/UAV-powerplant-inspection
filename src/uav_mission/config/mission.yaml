@@ -3,6 +3,12 @@ mission:
   name: powerplant_inspection
   frame_id: map
 
+  flight_levels:
+    standard_altitude_m: 7.0
+    inspection_altitudes_m: [3.0, 5.0, 7.0, 10.0]
+    low_object_inspection_altitude_m: 5.0
+    high_object_inspection_altitude_m: 10.0
+
   uavs:
     - id: uav_1
       start_position: [-5.0, 0.0, 0.0]
@@ -15,31 +21,62 @@ mission:
       battery_remaining: 100.0
 
   constraints:
-    minimum_battery_percent: 20.0
     minimum_separation_m: 3.0
-    maximum_altitude_m: 30.0
+    maximum_altitude_m: 15.0
+    uav_vertical_half_extent_m: 0.25
+    vertical_obstacle_clearance_m: 0.25
+
+  recovery:
+    low_battery_threshold_percent: 30.0
+    # Required battery after the complete return route and landing.
+    post_landing_reserve_percent: 10.0
+    battery_consumption_per_meter: 0.05
+    inspection_consumption_per_minute: 0.25
+    distance_safety_factor: 1.3
+    landing_energy_percentage: 2.0
+    landing_altitude_m: 0.2
+    landing_timeout_sec: 30.0
+    ugv_frame_id: map
+    # Uses the known open UAV staging point from the Gazebo launch poses.
+    ugv_location: [-5.0, 0.0, 0.2]
+
+  navigation:
+    maximum_retries: 5
+    operating_region:
+      x_min_m: -50.0
+      x_max_m: 20.0
+      y_min_m: -80.0
+      y_max_m: 80.0
+      z_min_m: 0.0
+      z_max_m: 15.0
 
   tasks:
-    - id: EQUIPMENT_COMPLEX_NORTH_VIEW
+    - id: TRANFORMER
       type: inspection
-      waypoint: [-9.469, 12.645, 10.0]
+      waypoint: [4.5, 15.0, 5.0]
       priority: 1
-      estimated_duration_s: 45.0
+      estimated_duration_s: 10.0
 
-    - id: EQUIPMENT_COMPLEX_SOUTH_VIEW
+    - id: POWER_CELLS
       type: inspection
-      waypoint: [-9.469, -62.478, 10.0]
+      waypoint: [-15.0, 15.0, 5.0]
       priority: 1
-      estimated_duration_s: 45.0
+      estimated_duration_s: 15.0
 
-    - id: EQUIPMENT_COMPLEX_WEST_VIEW
+    - id: BUILDING_NORTH_VIEW
       type: inspection
-      waypoint: [-31.25, -24.917, 10.0]
-      priority: 1
-      estimated_duration_s: 45.0
+      waypoint: [-12.0, 20.0, 7.0]
+      priority: 2
+      estimated_duration_s: 12.0
 
-    - id: EQUIPMENT_COMPLEX_EAST_VIEW
+    - id: POWER_GENERATOR
       type: inspection
-      waypoint: [12.313, -24.917, 10.0]
-      priority: 1
-      estimated_duration_s: 45.0
+      waypoint: [6.0, -30.0, 3.0]
+      priority: 2
+      estimated_duration_s: 8.0
+
+    - id: POLES
+      type: inspection
+      waypoint: [-28.0, -10.0, 7.0]
+      priority: 3
+      estimated_duration_s: 5.0

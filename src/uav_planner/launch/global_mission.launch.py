@@ -51,6 +51,23 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'enable_dynamic_obstacle', default_value='false'
         ),
+        DeclareLaunchArgument('results_dir', default_value=''),
+        DeclareLaunchArgument(
+            'save_task_level_results', default_value='true'
+        ),
+        DeclareLaunchArgument(
+            'simulation_shutdown_delay_sec', default_value='2.0'
+        ),
+        DeclareLaunchArgument(
+            'require_algorithm_comparison_results',
+            default_value='true',
+        ),
+        # The comparison runner is independent of the live UAV clients and
+        # finishes its complete three-algorithm output before normal shutdown.
+        _include(
+            'benchmarks', 'benchmark.launch.py',
+            {'results_dir': LaunchConfiguration('results_dir')},
+        ),
         _include(
             'uav_sim',
             'two_uav_gazebo.launch.py',
@@ -78,7 +95,22 @@ def generate_launch_description():
         ),
         TimerAction(
             period=21.0,
-            actions=[_include('uav_mission', 'mission.launch.py')],
+            actions=[_include(
+                'uav_mission', 'mission.launch.py',
+                {
+                    'results_dir': LaunchConfiguration('results_dir'),
+                    'save_task_level_results': LaunchConfiguration(
+                        'save_task_level_results'
+                    ),
+                    'simulation_shutdown_delay_sec': LaunchConfiguration(
+                        'simulation_shutdown_delay_sec'
+                    ),
+                    'require_algorithm_comparison_results':
+                        LaunchConfiguration(
+                        'require_algorithm_comparison_results'
+                    ),
+                },
+            )],
         ),
         TimerAction(
             period=24.0,

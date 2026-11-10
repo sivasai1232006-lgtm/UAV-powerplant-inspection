@@ -11,6 +11,11 @@ def generate_launch_description():
         'config',
         'uav.yaml',
     )
+    frames_path = os.path.join(
+        get_package_share_directory('uav_info'),
+        'config',
+        'coordinate_frames.yaml',
+    )
 
     nodes = [
         Node(
@@ -20,8 +25,10 @@ def generate_launch_description():
             name='uav_info',
             parameters=[
                 config_path,
+                frames_path,
                 {
                     'uav.id': uav_id,
+                    'frames.local': f'{uav_id}/odom',
                     'frames.body': f'{uav_id}/base_link',
                     'use_sim_time': True,
                 },

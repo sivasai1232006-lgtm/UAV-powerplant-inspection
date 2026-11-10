@@ -14,6 +14,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/ReassignTask.srv"
   "srv/GetUnassignedTasks.srv"
   "srv/AssignTask.srv"
+  "srv/ConfirmRecovery.srv"
+  "srv/AddTask.srv"
+  "srv/CancelTask.srv"
   "action/GoToWaypoint.action"
   DEPENDENCIES action_msgs geometry_msgs
 )

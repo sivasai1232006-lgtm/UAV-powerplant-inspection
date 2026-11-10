@@ -31,6 +31,7 @@ setup(
     entry_points={
         'console_scripts': [
             'mission_manager = uav_mission.mission_manager:main',
+            'nav2_shutdown_coordinator = uav_mission.nav2_shutdown:main',
         ],
     },
 )
