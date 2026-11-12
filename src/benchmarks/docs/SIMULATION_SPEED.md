@@ -12,14 +12,11 @@ the Gazebo simulator clock through its Gazebo integration and Micro XRCE-DDS
 transport. Sensor rates and PX4 source were not changed.
 
 The controller publishes PX4 `TrajectorySetpoint` velocity fields while a
-waypoint is active. The configurable `horizontal_velocity_multiplier` is
-applied once to the XY command limit in `uav_control/config/uav_param.yaml`.
-The command direction is preserved; vertical setpoints retain the original
-per-goal cap. The controller caps horizontal output at `max_velocity_limit`
-(5 m/s). The mission's 2.0 m/s goal therefore produces at most 2.4 m/s. The
-allocator's travel-time estimate was updated to 2.4 m/s. Battery estimation is
-distance-based, so the multiplier changes estimated flight time but not energy
-per meter.
+waypoint is active. Horizontal and vertical commands use the configured
+`velocity_gain` and are capped by the active goal's velocity limit; horizontal
+commands are also capped by `max_velocity_limit` (5 m/s). The allocator uses
+its configured `nominal_speed_mps` directly for travel-time estimates.
+Battery estimation is distance-based.
 
 The checked PX4 source (`v1.18.0-beta1-834-gb3e343c153`) defaults
 `MPC_XY_VEL_MAX` to 12 m/s, `MPC_ACC_HOR` to 3 m/s^2, and `MPC_ACC_HOR_MAX` to

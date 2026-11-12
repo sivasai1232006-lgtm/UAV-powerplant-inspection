@@ -1,5 +1,4 @@
 """Generate altitude-filtered 2.5D structural occupancy maps from an SDF world."""
-
 import argparse
 import json
 from pathlib import Path

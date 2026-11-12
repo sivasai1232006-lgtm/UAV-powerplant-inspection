@@ -6,8 +6,6 @@
     target_yaw: 0.0
     target_system: 2
     start_enabled: true
-    horizontal_velocity_multiplier: 1.2
-    forward_speed_multiplier: 1.5
     max_velocity_limit: 5.0
     map.frame_id: map
     telemetry_timeout_sec: 2.0
@@ -20,8 +18,6 @@
     target_yaw: 0.0
     target_system: 3
     start_enabled: true 
-    horizontal_velocity_multiplier: 1.2
-    forward_speed_multiplier: 1.5
     max_velocity_limit: 5.0
     map.frame_id: map
     telemetry_timeout_sec: 2.0
