@@ -458,7 +458,7 @@ def run_greedy(
     allocator: AuctionAllocator, tasks, uavs, homes, max_tasks_per_uav=None,
     operating_bounds=None,
 ):
-    """Allocate tasks in priority order using minimum incremental distance."""
+    """Allocate priority-ordered tasks while balancing complete UAV mission times."""
     started = time.perf_counter()
     capacity = max_tasks_per_uav or max(len(tasks), 1)
     eligible = _eligible(allocator, uavs, operating_bounds)
@@ -502,21 +502,24 @@ def run_greedy(
                 rejected.append(candidate_metrics['violations'][0])
                 continue
 
-            incremental_distance = (
-                candidate_metrics['total_distance']
-                - current_metrics['total_distance']
+            # Primary criterion: minimize projected team makespan. Each UAV
+            # workload includes its complete takeoff-to-landing route, including
+            # the selected return leg.
+            projected_makespan = candidate_metrics['makespan']
+
+            # Balance mission durations without forcing equal task counts.
+            projected_workloads = candidate_metrics['workload']
+            workload_imbalance = sum(
+                float(workload_sec) ** 2
+                for workload_sec in projected_workloads.values()
             )
-            incremental_makespan = (
-                candidate_metrics['makespan'] - current_metrics['makespan']
-            )
-            incremental_energy = (
-                candidate_metrics['total_energy']
-                - current_metrics['total_energy']
-            )
+
+            # Distance and energy remain important secondary criteria.
             choices.append((
-                incremental_distance,
-                incremental_makespan,
-                incremental_energy,
+                projected_makespan,
+                workload_imbalance,
+                candidate_metrics['total_distance'],
+                candidate_metrics['total_energy'],
                 str(uav_id),
                 uav_id,
                 proposal,
@@ -530,12 +533,13 @@ def run_greedy(
             )
             continue
 
-        # Minimize added route distance. Makespan and energy are deterministic
-        # tie-breakers; they do not override a shorter feasible route.
+        # Choose the assignment with the lowest projected team makespan.
+        # Workload balance, distance, energy, and UAV ID are tie-breakers.
         (
-            _delta_distance, _delta_makespan, _delta_energy, _uav_sort_key,
-            selected_uav_id, assignments, current_metrics,
-        ) = min(choices, key=lambda choice: choice[:4])
+            _projected_makespan, _workload_imbalance, _total_distance,
+            _total_energy, _uav_sort_key, selected_uav_id,
+            assignments, current_metrics,
+        ) = min(choices, key=lambda choice: choice[:5])
         counts[selected_uav_id] += 1
 
     allocation_time_sec = time.perf_counter() - started
@@ -543,7 +547,7 @@ def run_greedy(
         allocator, 'greedy', started, tasks, uavs, homes, assignments,
         reasons,
         solver={
-            'name': 'priority-ordered incremental-distance greedy',
+            'name': 'priority-ordered mission-time-balanced greedy',
             'status': 'not_applicable',
         },
         max_tasks_per_uav=max_tasks_per_uav,

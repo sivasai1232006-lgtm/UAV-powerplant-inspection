@@ -161,7 +161,7 @@ def _aggregate_metrics(evaluation, task_count, run_info):
     total_task_count = task_count + len(infeasible_tasks)
     unassigned_count = total_task_count - assigned_count
     estimated_completion_by_uav = {
-        uav_id: float(workload_sec)
+        uav_id: 2.0 * float(workload_sec)
         for uav_id, workload_sec in evaluation.workload_by_uav_sec.items()
     }
     assigned_tasks_by_uav = {
@@ -504,9 +504,6 @@ def _write_algorithm_comparison(run_dir, metric_rows, run_info):
         ('Constraint Violations', 'Constraint Violations'),
     )
     lines = [
-        'UAV ALGORITHM PERFORMANCE COMPARISON',
-        '=====================================',
-        '',
         f'Scenario: {scenario}',
         'All mission, distance, and battery figures are estimates; no flight data is used.',
         '',

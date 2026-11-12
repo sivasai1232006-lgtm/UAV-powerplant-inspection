@@ -51,13 +51,13 @@ mission:
   tasks:
     - id: TRANFORMER
       type: inspection
-      waypoint: [2, 18.0, 5.0]
+      waypoint: [2, 20.0, 5.0]
       priority: 1
       estimated_duration_s: 10.0
 
     - id: POWER_CELLS
       type: inspection
-      waypoint: [-15.0, 18.0, 5.0]
+      waypoint: [-15.0, 20.0, 5.0]
       priority: 1
       estimated_duration_s: 15.0
 
@@ -79,14 +79,44 @@ mission:
       priority: 3
       estimated_duration_s: 5.0
 
-    # - id: OPEN_AREA
-    #   type: inspection
-    #   waypoint: [-25.0, -55.0, 7.0]
-    #   priority: 3
-    #   estimated_duration_s: 5.0
+    - id: OPEN_AREA
+      type: inspection
+      waypoint: [-25.0, -55.0, 7.0]
+      priority: 3
+      estimated_duration_s: 5.0
 
-    # - id: MIDDLE_LINE
-    #   type: inspection
-    #   waypoint: [-3.0, -60.0, 5.0]
-    #   priority: 1
-    #   estimated_duration_s: 5.0
+    - id: MIDDLE_LINE
+      type: inspection
+      waypoint: [-3.0, -60.0, 5.0]
+      priority: 1
+      estimated_duration_s: 5.0
+
+    - id: BUILDING_WEST_VIEW
+      type: inspection
+      waypoint: [-27.5, 45.0, 5.0]
+      priority: 3
+      estimated_duration_s: 10.0
+
+    - id: BUILDING_SOUTH_VIEW
+      type: inspection
+      waypoint: [5.5, 45.0, 5.0]
+      priority: 3
+      estimated_duration_s: 5.0
+
+    - id: PLANT_EAST_VIEW
+      type: inspection
+      waypoint: [0.5, -65.0, 5.0]
+      priority: 4
+      estimated_duration_s: 5.0
+
+    - id: POWER_GENERATOR_2
+      type: inspection
+      waypoint: [6.0, -25.0, 3.0]
+      priority: 2
+      estimated_duration_s: 5.0
+
+    - id: CHIMNEY
+      type: inspection
+      waypoint: [4.0, 55.0, 10.0]
+      priority: 2
+      estimated_duration_s: 5.0
