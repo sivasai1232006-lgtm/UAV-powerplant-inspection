@@ -1,0 +1,10 @@
+Algorithm: milp
+Feasibility: FEASIBLE
+Tasks assigned/unassigned: 9/0 of 9
+Estimated total mission time: 436.11 s; offline route estimate only
+Allocation computation: 4.135445 s
+Estimated travel distance: 515.00 m
+Estimated energy: 30.06% battery
+Battery/safety violations: 0/0
+Assigned to uav_1: MIDDLE_LINE, BUILDING_SOUTH_VIEW, BUILDING_WEST_VIEW, OPEN_AREA, POLES; inspection: 30.00 s; return: [-5.0, 0.0, 0.2]
+Assigned to uav_2: TRANFORMER, BUILDING_NORTH_VIEW, POWER_CELLS, POWER_GENERATOR; inspection: 45.00 s; return: [5.0, 0.0, 0.2]

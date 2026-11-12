@@ -1,0 +1,234 @@
+{
+  "algorithm_name": "milp",
+  "allocation_computation_time_sec": 4.135444847999679,
+  "assigned_task_count": 9,
+  "assigned_tasks_by_uav": {
+    "uav_1": [
+      "MIDDLE_LINE",
+      "BUILDING_SOUTH_VIEW",
+      "BUILDING_WEST_VIEW",
+      "OPEN_AREA",
+      "POLES"
+    ],
+    "uav_2": [
+      "TRANFORMER",
+      "BUILDING_NORTH_VIEW",
+      "POWER_CELLS",
+      "POWER_GENERATOR"
+    ]
+  },
+  "battery_or_safety_violation_count": 0,
+  "battery_violation_count": 0,
+  "configuration": {
+    "battery_consumption_per_meter": 0.05,
+    "cost_weights": {
+      "battery": 0.0,
+      "distance": 0.4,
+      "energy": 0.25,
+      "future": 0.0,
+      "priority": 0.1,
+      "time": 0.25,
+      "workload": 0.0
+    },
+    "distance_safety_factor": 1.3,
+    "future_lookahead_tasks": 0,
+    "inspection_consumption_per_minute": 0.25,
+    "max_tasks_per_uav": 9,
+    "maximum_workload_sec": 1800.0,
+    "milp_time_limit_sec": 10.0,
+    "minimum_battery_reserve_percentage": 10.0,
+    "minimum_separation_m": 3.0,
+    "nominal_speed_mps": 3.6,
+    "operating_bounds": {
+      "uav_1": {
+        "x_max": 20.0,
+        "x_min": -50.0,
+        "y_max": 80.0,
+        "y_min": -80.0,
+        "z_max": 15.0,
+        "z_min": 0.0
+      },
+      "uav_2": {
+        "x_max": 20.0,
+        "x_min": -50.0,
+        "y_max": 80.0,
+        "y_min": -80.0,
+        "z_max": 15.0,
+        "z_min": 0.0
+      }
+    }
+  },
+  "constraint_violation_count": 0,
+  "constraint_violations": [],
+  "estimated_distance_by_uav_m": {
+    "uav_1": 294.3325705353998,
+    "uav_2": 220.66601604761763
+  },
+  "estimated_energy_by_uav_percent": {
+    "uav_1": 16.841628526769988,
+    "uav_2": 13.220800802380882
+  },
+  "estimated_energy_consumption_percent": 30.06242932915087,
+  "estimated_mission_time_by_uav_sec": {
+    "uav_1": 223.51809474188877,
+    "uav_2": 212.59223113756536
+  },
+  "estimated_total_distance_m": 514.9985865830174,
+  "estimated_total_mission_time_sec": 436.11032587945414,
+  "feasibility_status": "FEASIBLE",
+  "feasible": true,
+  "infeasible_task_count": 0,
+  "infeasible_tasks": {},
+  "inspection_time_by_uav_sec": {
+    "uav_1": 30.0,
+    "uav_2": 45.0
+  },
+  "number_of_tasks": 9,
+  "number_of_waypoints": 9,
+  "remaining_battery_by_uav_percent": {
+    "uav_1": 83.15837147323,
+    "uav_2": 86.77919919761912
+  },
+  "return_destination_by_uav": {
+    "uav_1": [
+      -5.0,
+      0.0,
+      0.2
+    ],
+    "uav_2": [
+      5.0,
+      0.0,
+      0.2
+    ]
+  },
+  "safety_violation_count": 0,
+  "solver": {
+    "incumbent_available": true,
+    "name": "COIN_CMD via PuLP",
+    "time_limit_sec": 10.0
+  },
+  "status": "completed",
+  "task_assignment_coverage_percentage": 100.0,
+  "task_assignment_results": {
+    "BUILDING_NORTH_VIEW": {
+      "estimated_distance_m": 31.22953020920881,
+      "estimated_energy_percent": 1.6114765104604407,
+      "estimated_workload_sec": 20.674869502558003,
+      "priority": 2,
+      "status": "assigned_not_executed",
+      "uav_id": "uav_2"
+    },
+    "BUILDING_SOUTH_VIEW": {
+      "estimated_distance_m": 27.613221544436666,
+      "estimated_energy_percent": 1.4014944105551665,
+      "estimated_workload_sec": 12.670339317899074,
+      "priority": 3,
+      "status": "assigned_not_executed",
+      "uav_id": "uav_1"
+    },
+    "BUILDING_WEST_VIEW": {
+      "estimated_distance_m": 48.1,
+      "estimated_energy_percent": 2.4466666666666668,
+      "estimated_workload_sec": 23.36111111111111,
+      "priority": 3,
+      "status": "assigned_not_executed",
+      "uav_id": "uav_1"
+    },
+    "MIDDLE_LINE": {
+      "estimated_distance_m": 89.7433213029789,
+      "estimated_energy_percent": 4.507999398482278,
+      "estimated_workload_sec": 29.92870036193858,
+      "priority": 1,
+      "status": "assigned_not_executed",
+      "uav_id": "uav_1"
+    },
+    "OPEN_AREA": {
+      "estimated_distance_m": 28.802337681970286,
+      "estimated_energy_percent": 1.4609502174318476,
+      "estimated_workload_sec": 13.000649356102857,
+      "priority": 3,
+      "status": "assigned_not_executed",
+      "uav_id": "uav_1"
+    },
+    "POLES": {
+      "estimated_distance_m": 100.07369000601392,
+      "estimated_energy_percent": 5.024517833634031,
+      "estimated_workload_sec": 32.79824722389276,
+      "priority": 3,
+      "status": "assigned_not_executed",
+      "uav_id": "uav_1"
+    },
+    "POWER_CELLS": {
+      "estimated_distance_m": 25.04147945212169,
+      "estimated_energy_percent": 1.3145739726060846,
+      "estimated_workload_sec": 21.95596651447825,
+      "priority": 1,
+      "status": "assigned_not_executed",
+      "uav_id": "uav_2"
+    },
+    "POWER_GENERATOR": {
+      "estimated_distance_m": 128.9722325181241,
+      "estimated_energy_percent": 6.481944959239537,
+      "estimated_workload_sec": 43.82562014392335,
+      "priority": 2,
+      "status": "assigned_not_executed",
+      "uav_id": "uav_2"
+    },
+    "TRANFORMER": {
+      "estimated_distance_m": 35.422773868163056,
+      "estimated_energy_percent": 1.8128053600748195,
+      "estimated_workload_sec": 19.83965940782307,
+      "priority": 1,
+      "status": "assigned_not_executed",
+      "uav_id": "uav_2"
+    }
+  },
+  "uav_initial_conditions": {
+    "uav_1": {
+      "battery_percentage": 100.0,
+      "connected": true,
+      "initial_workload_sec": 0.0,
+      "mission_status": 0,
+      "normal_landing_target": [
+        -5.0,
+        0.0,
+        0.2
+      ],
+      "operational": true,
+      "position": [
+        -5.0,
+        0.0,
+        0.0
+      ],
+      "takeoff_position": [
+        -5.0,
+        0.0,
+        0.0
+      ]
+    },
+    "uav_2": {
+      "battery_percentage": 100.0,
+      "connected": true,
+      "initial_workload_sec": 0.0,
+      "mission_status": 0,
+      "normal_landing_target": [
+        5.0,
+        0.0,
+        0.2
+      ],
+      "operational": true,
+      "position": [
+        5.0,
+        0.0,
+        0.0
+      ],
+      "takeoff_position": [
+        5.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "unassigned_task_count": 0,
+  "unassigned_task_reasons": {}
+}

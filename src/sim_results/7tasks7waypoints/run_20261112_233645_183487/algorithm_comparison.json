@@ -1,0 +1,61 @@
+{
+  "algorithms": [
+    {
+      "Algorithm": "Existing",
+      "Allocation Time (s)": 0.0006039449999661883,
+      "Constraint Violations": 0,
+      "Estimated Energy Consumed (pp)": 26.43060384445581,
+      "Estimated Mission Time (s)": 366.4511538272868,
+      "Estimated Total Distance (m)": 443.6120768891162,
+      "Estimated UAV 1 Battery Used (pp)": 10.485418954213191,
+      "Estimated UAV 1 Distance (m)": 167.04171241759715,
+      "Estimated UAV 1 Remaining Battery (%)": 89.51458104578681,
+      "Estimated UAV 2 Battery Used (pp)": 15.94518489024262,
+      "Estimated UAV 2 Distance (m)": 276.57036447151904,
+      "Estimated UAV 2 Remaining Battery (%)": 84.05481510975739,
+      "Feasible": true,
+      "Task Assignment Coverage (%)": 100.0,
+      "Tasks Assigned": 7,
+      "Unassigned Tasks": 0
+    },
+    {
+      "Algorithm": "MILP",
+      "Allocation Time (s)": 1.0322565830001622,
+      "Constraint Violations": 0,
+      "Estimated Energy Consumed (pp)": 22.973622304707877,
+      "Estimated Mission Time (s)": 328.04024783008754,
+      "Estimated Total Distance (m)": 374.4724460941575,
+      "Estimated UAV 1 Battery Used (pp)": 13.91379533544695,
+      "Estimated UAV 1 Distance (m)": 236.35924004227232,
+      "Estimated UAV 1 Remaining Battery (%)": 86.08620466455305,
+      "Estimated UAV 2 Battery Used (pp)": 9.059826969260927,
+      "Estimated UAV 2 Distance (m)": 138.1132060518852,
+      "Estimated UAV 2 Remaining Battery (%)": 90.94017303073907,
+      "Feasible": true,
+      "Task Assignment Coverage (%)": 100.0,
+      "Tasks Assigned": 7,
+      "Unassigned Tasks": 0
+    },
+    {
+      "Algorithm": "Greedy",
+      "Allocation Time (s)": 0.00041008800008057733,
+      "Constraint Violations": 0,
+      "Estimated Energy Consumed (pp)": 28.433576156981953,
+      "Estimated Mission Time (s)": 388.7064017442439,
+      "Estimated Total Distance (m)": 483.6715231396391,
+      "Estimated UAV 1 Battery Used (pp)": 16.082653313096564,
+      "Estimated UAV 1 Distance (m)": 280.1530662619313,
+      "Estimated UAV 1 Remaining Battery (%)": 83.91734668690344,
+      "Estimated UAV 2 Battery Used (pp)": 12.350922843885389,
+      "Estimated UAV 2 Distance (m)": 203.51845687770776,
+      "Estimated UAV 2 Remaining Battery (%)": 87.64907715611461,
+      "Feasible": true,
+      "Task Assignment Coverage (%)": 100.0,
+      "Tasks Assigned": 7,
+      "Unassigned Tasks": 0
+    }
+  ],
+  "comparison_model_version": "coverage_bounds_v4",
+  "metric_basis": "Offline estimate-only comparison. All algorithms use the same route evaluator, distance model, task set, operating bounds, return policy, battery model, workload limit, capacity, and separation constraints. Mission time includes each UAV return leg and is the sum of the individual UAV takeoff-to-landing times.",
+  "scenario": "7 Tasks, 7 Waypoints"
+}

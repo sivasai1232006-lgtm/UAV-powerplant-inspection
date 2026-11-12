@@ -1,0 +1,10 @@
+Algorithm: greedy
+Feasibility: FEASIBLE
+Tasks assigned/unassigned: 11/0 of 11
+Estimated total mission time: 573.50 s; offline route estimate only
+Allocation computation: 0.000796 s
+Estimated travel distance: 726.30 m
+Estimated energy: 40.67% battery
+Battery/safety violations: 0/0
+Assigned to uav_1: BUILDING_SOUTH_VIEW, BUILDING_WEST_VIEW, POWER_GENERATOR_2, POWER_GENERATOR, MIDDLE_LINE; inspection: 33.00 s; return: [-5.0, 0.0, 0.2]
+Assigned to uav_2: PLANT_EAST_VIEW, OPEN_AREA, POLES, BUILDING_NORTH_VIEW, POWER_CELLS, TRANFORMER; inspection: 52.00 s; return: [5.0, 0.0, 0.2]

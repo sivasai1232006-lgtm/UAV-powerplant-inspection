@@ -1,0 +1,157 @@
+{
+  "inspection_completion_time_sec": null,
+  "inspection_time_sec": 0.0,
+  "mission_failed_reasons": {},
+  "mission_status": "INCOMPLETE",
+  "mission_time_sec": 5.739999999999998,
+  "navigation_failures": 0,
+  "planned_distance_m": 42.00133750149827,
+  "planning_time_sec": 0.01383878900014679,
+  "replan_count": 0,
+  "return_distance_m": 0.0,
+  "run_status": "INTERRUPTED",
+  "saved_at_utc": "2026-11-12T18:06:37.078501+00:00",
+  "schema_version": 1,
+  "started_at_utc": "2026-11-12T18:06:31.338119+00:00",
+  "task_counts": {
+    "cancelled": 0,
+    "completed": 0,
+    "failed": 0,
+    "total": 8,
+    "unfinished": 8
+  },
+  "tasks": [
+    {
+      "assigned_uav": "uav_2",
+      "estimated_duration_sec": 10.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "ASSIGNED",
+      "task_id": "TRANFORMER",
+      "x_m": 2.0,
+      "y_m": 18.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "uav_1",
+      "estimated_duration_sec": 15.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "ASSIGNED",
+      "task_id": "POWER_CELLS",
+      "x_m": -15.0,
+      "y_m": 18.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 12.0,
+      "failure_reason": "",
+      "priority": 2,
+      "status": "UNASSIGNED",
+      "task_id": "BUILDING_NORTH_VIEW",
+      "x_m": -12.0,
+      "y_m": 35.0,
+      "z_m": 7.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 8.0,
+      "failure_reason": "",
+      "priority": 2,
+      "status": "UNASSIGNED",
+      "task_id": "POWER_GENERATOR",
+      "x_m": 6.0,
+      "y_m": -30.0,
+      "z_m": 3.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 5.0,
+      "failure_reason": "",
+      "priority": 3,
+      "status": "UNASSIGNED",
+      "task_id": "POLES",
+      "x_m": -28.0,
+      "y_m": -10.0,
+      "z_m": 7.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 5.0,
+      "failure_reason": "",
+      "priority": 3,
+      "status": "UNASSIGNED",
+      "task_id": "OPEN_AREA",
+      "x_m": -25.0,
+      "y_m": -55.0,
+      "z_m": 7.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 5.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "UNASSIGNED",
+      "task_id": "MIDDLE_LINE",
+      "x_m": -3.0,
+      "y_m": -60.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 5.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "UNASSIGNED",
+      "task_id": "BUILDING_WEST_VIEW",
+      "x_m": -27.5,
+      "y_m": -75.0,
+      "z_m": 5.0
+    }
+  ],
+  "total_distance_m": 2.424392218981643,
+  "travel_time_sec": 2.399654654999722,
+  "uavs": {
+    "uav_1": {
+      "distance_m": 1.1906769469063583,
+      "energy_consumed_wh": 0.0,
+      "final_battery_percent": 95.03307342529297,
+      "final_estimated_battery_percent": 95.00970840454102,
+      "final_position_m": [
+        -4.682064603669962,
+        -0.007111704133749952,
+        1.1807616268731622
+      ],
+      "initial_battery_percent": 99.99465942382812,
+      "initial_estimated_battery_percent": 99.99465942382812,
+      "return_failure_reason": "",
+      "return_status": "NOT_RETURNED",
+      "takeoff_position_m": [
+        -5.008448136215775,
+        -0.0021041005996215167,
+        0.18501186724002774
+      ]
+    },
+    "uav_2": {
+      "distance_m": 1.2337152720752849,
+      "energy_consumed_wh": 0.0,
+      "final_battery_percent": 95.01676559448242,
+      "final_estimated_battery_percent": 94.99273896217346,
+      "final_position_m": [
+        5.33689045432537,
+        0.0009760952539916712,
+        1.24508203473125
+      ],
+      "initial_battery_percent": 99.99465942382812,
+      "initial_estimated_battery_percent": 99.99465942382812,
+      "return_failure_reason": "",
+      "return_status": "NOT_RETURNED",
+      "takeoff_position_m": [
+        5.031024411995228,
+        0.024078305234215752,
+        0.22566737323875274
+      ]
+    }
+  }
+}
