@@ -24,7 +24,6 @@ class Evaluation:
     remaining_battery_by_uav_percent: dict
     workload_by_uav_sec: dict
     violations: list
-    objective_value: float = 0.0
     return_choices: dict = field(default_factory=dict)
 
 
@@ -70,50 +69,6 @@ def _objective_distance_bound(allocator, tasks, uavs, homes):
                 valid_distances.append(distance)
     maximum_leg = max(valid_distances, default=0.0)
     return maximum_leg * (len(tasks) + len(uavs))
-
-
-def _plan_objective(allocator, tasks, metrics):
-    """Order by coverage, priority, makespan, and resource use."""
-    cost = allocator.cost_function
-    maximum_priority = cost.maximum_priority
-    priority_range = maximum_priority - cost.minimum_priority
-    max_workload = allocator.maximum_workload_sec
-    priority_scale = max_workload + 1.0
-    coverage_scale = (
-        len(tasks) * priority_range * priority_scale
-        + max_workload + 3.0
-    )
-    priority_penalty = sum(
-        maximum_priority - min(
-            maximum_priority,
-            max(cost.minimum_priority, int(row['priority'])),
-        )
-        for row in metrics['assignments']
-    )
-    unassigned_count = len(tasks) - len(metrics['assigned_task_ids'])
-    distance_bound = _objective_distance_bound(
-        allocator, tasks, metrics['uavs'], metrics['homes']
-    )
-    energy_bound = (
-        distance_bound
-        * allocator.battery_feasibility.consumption_per_meter
-        + sum(
-            max(0.0, float(task.estimated_duration_sec))
-            for task in tasks
-            if math.isfinite(float(task.estimated_duration_sec))
-        ) / 60.0
-        * allocator.battery_feasibility.inspection_consumption_per_minute
-        + len(metrics['distance'])
-        * float(getattr(allocator, 'landing_energy_percentage', 0.0))
-        + 1.0
-    )
-    return float(
-        unassigned_count * coverage_scale
-        + priority_penalty * priority_scale
-        + metrics['makespan']
-        + 0.001 * metrics['total_distance'] / (distance_bound + 1.0)
-        + 0.001 * metrics['total_energy'] / (energy_bound + 1.0)
-    )
 
 
 def _plan_metrics(
@@ -221,7 +176,6 @@ def _plan_metrics(
             outbound_distance += leg
             inspection_duration += float(task.estimated_duration_sec)
             row['estimated_distance_m'] = float(leg)
-            row['estimated_return_distance_m'] = 0.0
             row['estimated_energy_percent'] = (
                 float(leg) * consumption_per_meter
                 + float(task.estimated_duration_sec) / 60.0
@@ -324,7 +278,22 @@ def _plan_metrics(
                 f'battery reserve violated by {uav.uav_id}: '
                 f'{final_battery:.3f}% < {min_reserve:.3f}%'
             )
-        workload = full_distance / speed + inspection_duration
+        # The mission runs from takeoff to landing. Attribute the final
+        # return leg to the last task so summing per-task workload gives the
+        # complete UAV mission duration (outbound travel + inspections + return).
+        if route:
+            final_task_row = enriched_rows[route[-1]['task_id']]
+            final_task_row['estimated_distance_m'] += float(selected_distance)
+            final_task_row['estimated_energy_percent'] += (
+                float(selected_distance) * consumption_per_meter
+            )
+            final_task_row['estimated_workload_sec'] += (
+                float(selected_distance) / speed
+            )
+
+        workload = sum(
+            float(row.get('estimated_workload_sec', 0.0)) for row in route
+        )
         if workload > allocator.maximum_workload_sec + 1e-8:
             violations.append(
                 f'workload limit violated by {uav.uav_id}: '
@@ -337,11 +306,6 @@ def _plan_metrics(
         workload_by_uav[uav.uav_id] = workload
         inspection_by_uav[uav.uav_id] = inspection_duration
         return_choices[uav.uav_id] = selected_name
-        if route:
-            enriched_rows[route[-1]['task_id']]['estimated_return_distance_m'] = float(
-                selected_distance
-            )
-
     return {
         'distance': distance_by_uav,
         'energy': energy_by_uav,
@@ -384,7 +348,6 @@ def _make_evaluation(
         remaining_battery_by_uav_percent=metrics['remaining_battery'],
         workload_by_uav_sec=metrics['workload'],
         violations=metrics['violations'],
-        objective_value=_plan_objective(allocator, tasks, metrics),
         return_choices=metrics['return_choices'],
     )
 
@@ -495,59 +458,94 @@ def run_greedy(
     allocator: AuctionAllocator, tasks, uavs, homes, max_tasks_per_uav=None,
     operating_bounds=None,
 ):
-    """Greedily add the highest-priority feasible task with lowest makespan."""
+    """Allocate tasks in priority order using minimum incremental distance."""
     started = time.perf_counter()
     capacity = max_tasks_per_uav or max(len(tasks), 1)
     eligible = _eligible(allocator, uavs, operating_bounds)
-    remaining = {task.task_id: task for task in tasks}
     assignments, reasons = [], {}
     counts = {u.uav_id: 0 for u in uavs}
 
-    while remaining:
+    # A fixed priority order makes this a simple, deterministic greedy
+    # heuristic. Task ID provides a stable tie-break for equal priorities.
+    ordered_tasks = sorted(
+        tasks, key=lambda task: (-int(task.priority), str(task.task_id))
+    )
+
+    # Evaluate the empty plan once. Each candidate is compared with this
+    # accepted plan, so the score is the marginal change in total route length.
+    current_metrics = _plan_metrics(
+        allocator, tasks, uavs, homes, assignments, capacity,
+        operating_bounds,
+    )
+
+    for task in ordered_tasks:
         choices = []
-        rejected = {}
-        for task in remaining.values():
-            for uav in eligible:
-                if counts[uav.uav_id] >= capacity:
-                    continue
-                proposal = assignments + [{
-                    'task_id': task.task_id,
-                    'uav_id': uav.uav_id,
-                    'priority': task.priority,
-                    'bid': 0.0,
-                }]
-                metrics = _plan_metrics(
-                    allocator, tasks, uavs, homes, proposal, capacity,
-                    operating_bounds,
-                )
-                if metrics['violations']:
-                    rejected.setdefault(task.task_id, metrics['violations'][0])
-                    continue
-                choices.append((
-                    -int(task.priority), metrics['makespan'],
-                    _plan_objective(allocator, tasks, metrics),
-                    metrics['total_distance'], task.task_id, uav.uav_id,
-                    proposal,
-                ))
+        rejected = []
+
+        for uav in eligible:
+            uav_id = uav.uav_id
+            if counts[uav_id] >= capacity:
+                continue
+
+            proposal = assignments + [{
+                'task_id': task.task_id,
+                'uav_id': uav_id,
+                'priority': task.priority,
+                'bid': 0.0,
+            }]
+            candidate_metrics = _plan_metrics(
+                allocator, tasks, uavs, homes, proposal, capacity,
+                operating_bounds,
+            )
+
+            if candidate_metrics['violations']:
+                rejected.append(candidate_metrics['violations'][0])
+                continue
+
+            incremental_distance = (
+                candidate_metrics['total_distance']
+                - current_metrics['total_distance']
+            )
+            incremental_makespan = (
+                candidate_metrics['makespan'] - current_metrics['makespan']
+            )
+            incremental_energy = (
+                candidate_metrics['total_energy']
+                - current_metrics['total_energy']
+            )
+            choices.append((
+                incremental_distance,
+                incremental_makespan,
+                incremental_energy,
+                str(uav_id),
+                uav_id,
+                proposal,
+                candidate_metrics,
+            ))
+
         if not choices:
-            for task_id in remaining:
-                reasons[task_id] = rejected.get(
-                    task_id,
-                    'no available UAV satisfies the shared route constraints',
-                )
-            break
+            reasons[task.task_id] = (
+                rejected[0] if rejected
+                else 'no available UAV satisfies the shared route constraints'
+            )
+            continue
+
+        # Minimize added route distance. Makespan and energy are deterministic
+        # tie-breakers; they do not override a shorter feasible route.
         (
-            _priority, _time, _objective, _distance, task_id, uav_id, proposal
-        ) = min(choices)
-        assignments = proposal
-        counts[uav_id] += 1
-        del remaining[task_id]
+            _delta_distance, _delta_makespan, _delta_energy, _uav_sort_key,
+            selected_uav_id, assignments, current_metrics,
+        ) = min(choices, key=lambda choice: choice[:4])
+        counts[selected_uav_id] += 1
 
     allocation_time_sec = time.perf_counter() - started
     return _make_evaluation(
         allocator, 'greedy', started, tasks, uavs, homes, assignments,
         reasons,
-        solver={'name': 'deterministic route-aware greedy', 'status': 'not_applicable'},
+        solver={
+            'name': 'priority-ordered incremental-distance greedy',
+            'status': 'not_applicable',
+        },
         max_tasks_per_uav=max_tasks_per_uav,
         allocation_time_sec=allocation_time_sec,
         operating_bounds=operating_bounds,
@@ -573,15 +571,15 @@ def run_milp(
     if not tasks:
         return _make_evaluation(
             allocator, 'milp', started, tasks, uavs, homes, [], {},
-            {'name': 'PuLP MILP', 'status': 'Optimal', 'optimal': True,
-             'relative_gap': 0.0}, max_tasks_per_uav,
-            status='optimal',
+            {'name': 'PuLP MILP', 'incumbent_available': True},
+            max_tasks_per_uav,
+            status='completed',
             operating_bounds=operating_bounds,
         )
     if not eligible:
         return _failed(
             'milp', started, tasks, uavs, 'infeasible',
-            'no eligible UAV is available', solver_status='Infeasible',
+            'no eligible UAV is available',
         )
 
     capacity = max_tasks_per_uav or task_count
@@ -651,7 +649,6 @@ def run_milp(
         return _failed(
             'milp', started, tasks, uavs, 'failed',
             'route distance matrix contains invalid values',
-            solver_status='InvalidModel',
         )
 
     problem = pulp.LpProblem('uav_route_assignment', pulp.LpMinimize)
@@ -906,7 +903,6 @@ def run_milp(
             return _failed(
                 'milp', started, tasks, uavs, 'solver_unavailable',
                 'PuLP is installed, but no supported solver backend is available',
-                solver_status='solver_unavailable',
             )
         problem.solve(solver)
     except Exception as error:
@@ -926,7 +922,7 @@ def run_milp(
     if not feasible_incumbent:
         return _failed(
             'milp', started, tasks, uavs, solver_status.lower(),
-            'solver returned no feasible incumbent', solver_status=solver_status,
+            'solver returned no feasible incumbent',
         )
 
     route_order = []
@@ -958,44 +954,22 @@ def run_milp(
         'bid': 0.0,
     } for _order, task_id, uav_id, priority in route_order]
 
-    relative_gap = _milp_relative_gap(problem)
-    if solver_status == 'Optimal' and relative_gap is None:
-        relative_gap = 0.0
     solver_info = {
         'name': f'{solver.__class__.__name__} via PuLP',
-        'status': solver_status,
-        'optimal': solver_status == 'Optimal',
         'time_limit_sec': float(time_limit_sec),
-        'objective': pulp.value(problem.objective),
-        'relative_gap': relative_gap,
         'incumbent_available': feasible_incumbent,
-        'objective_definition': (
-            'maximize safe task coverage, then priority, then minimize '
-            'makespan, distance, and energy'
-        ),
     }
     allocation_time_sec = time.perf_counter() - started
     return _make_evaluation(
         allocator, 'milp', started, tasks, uavs, homes, assignments, reasons,
         solver_info, max_tasks_per_uav,
-        status='optimal' if solver_status == 'Optimal' else 'feasible_incumbent',
+        status='completed',
         allocation_time_sec=allocation_time_sec,
         operating_bounds=operating_bounds,
     )
 
 
-def _milp_relative_gap(problem):
-    model = getattr(problem, 'solverModel', None)
-    if model is None:
-        return None
-    try:
-        value = model.getMipRelativeGap()
-    except (AttributeError, TypeError, ValueError):
-        return None
-    return float(value) if value is not None and math.isfinite(value) else None
-
-
-def _failed(name, started, tasks, uavs, status, detail, solver_status=None):
+def _failed(name, started, tasks, uavs, status, detail):
     return Evaluation(
         name=name,
         status=status,
@@ -1004,7 +978,6 @@ def _failed(name, started, tasks, uavs, status, detail, solver_status=None):
         reasons={task.task_id: detail for task in tasks},
         solver={
             'name': 'PuLP MILP solver',
-            'status': solver_status or status,
             'detail': detail,
             'incumbent_available': False,
         },

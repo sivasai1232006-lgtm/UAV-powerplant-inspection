@@ -295,7 +295,6 @@ def test_infeasible_tasks_count_as_unassigned_in_benchmark_metrics():
     )
     run_info = {
         'waypoint_count': 2,
-        'velocity_multiplier': 1.0,
         'infeasible_tasks': {'building': 'No safe altitude.'},
     }
 
@@ -311,6 +310,7 @@ def test_infeasible_tasks_count_as_unassigned_in_benchmark_metrics():
         'uav_id': None,
         'reason': 'No safe altitude.',
     }
+    assert 'uav_velocity_multiplier' not in metrics
 
 
 def test_milp_reports_missing_solver_instead_of_fabricating_assignments(monkeypatch):
@@ -344,7 +344,7 @@ def test_results_use_shared_estimates_and_omit_unavailable_actual_metrics(tmp_pa
     assert results[1].solver['status'] == 'Optimal'
     run_info = {
         'waypoint_count': 2,
-        'velocity_multiplier': 1.2, 'configuration': {},
+        'configuration': {},
         'uav_initial_conditions': {},
     }
     from benchmarks.runner import _write_results

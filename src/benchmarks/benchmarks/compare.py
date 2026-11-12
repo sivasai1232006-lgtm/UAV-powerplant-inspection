@@ -1,5 +1,4 @@
 """Combine per-run benchmark JSON files into cross-scenario tables."""
-
 import argparse
 import csv
 import json
@@ -16,10 +15,9 @@ def collect(results_dir):
             comparison = json.loads(path.read_text(encoding='utf-8'))
         except (OSError, json.JSONDecodeError):
             continue
-        if comparison.get('comparison_model_version') != 'coverage_bounds_v3':
-            # Older files used a different MILP route model and included
-            # unavailable flight-only columns. Do not mix those estimates into
-            # current cross-run summaries.
+        if comparison.get('comparison_model_version') != 'coverage_bounds_v4':
+            # Older files used a different metric schema. Do not mix those estimates
+            # into current cross-run summaries.
             continue
         for algorithm, metrics in comparison.get('algorithms', {}).items():
             rows.append({
@@ -42,18 +40,16 @@ def collect(results_dir):
                     'estimated_total_distance_m',
                     metrics.get('estimated_distance_m'),
                 ),
+                'estimated_mission_time_sec': metrics.get(
+                    'estimated_total_mission_time_sec'
+                ),
                 'estimated_energy_percent': metrics.get(
                     'estimated_energy_consumption_percent',
                     metrics.get('estimated_energy_percent'),
                 ),
-                'solver_status': metrics.get('solver', {}).get('status'),
                 'feasibility_status': metrics.get('feasibility_status'),
                 'battery_violation_count': metrics.get('battery_violation_count'),
                 'safety_violation_count': metrics.get('safety_violation_count'),
-                'milp_optimality_gap': metrics.get('milp_optimality_gap'),
-                'uav_velocity_multiplier': comparison.get(
-                    'uav_velocity_multiplier'
-                ),
             })
     return rows
 

@@ -13,30 +13,25 @@ from uav_info.coordinate_transform import enu_to_ned
 from uav_interfaces.msg import UAVState
 
 
-def test_horizontal_multiplier_preserves_direction_and_vertical_cap():
+def test_velocity_setpoint_respects_speed_caps_and_preserves_direction():
     velocity = calculate_velocity_setpoint(
-        (10.0, 10.0, 4.0), 1.0, 2.0, 5.0, 1.2
+        (10.0, 10.0, 4.0), 1.0, 2.0, 5.0
     )
-    assert math.isclose(math.hypot(*velocity[:2]), 3.6, rel_tol=1e-9)
+    assert math.isclose(math.hypot(*velocity[:2]), 2.0, rel_tol=1e-9)
     assert math.isclose(velocity[0], velocity[1], rel_tol=1e-9)
     assert velocity[2] == 2.0
 
 
-def test_forward_multiplier_does_not_change_vertical_speed_or_direction():
-    baseline = calculate_velocity_setpoint(
-        (4.0, 3.0, 1.0), 1.0, 2.0, 5.0, 1.2, 1.0
-    )
-    faster = calculate_velocity_setpoint(
-        (4.0, 3.0, 1.0), 1.0, 2.0, 5.0, 1.2, 1.5
-    )
-    assert math.isclose(faster[0] / baseline[0], 1.5, rel_tol=1e-9)
-    assert math.isclose(faster[1] / baseline[1], 1.5, rel_tol=1e-9)
-    assert faster[2] == baseline[2]
-
-
-def test_application_velocity_limit_caps_scaled_horizontal_command():
+def test_velocity_gain_applies_equally_to_horizontal_and_vertical():
     velocity = calculate_velocity_setpoint(
-        (10.0, 0.0, -10.0), 1.0, 5.0, 5.0, 1.2
+        (4.0, 3.0, 1.0), 0.5, 5.0, 5.0
+    )
+    assert velocity == (2.0, 1.5, 0.5)
+
+
+def test_application_velocity_limit_caps_horizontal_and_vertical_commands():
+    velocity = calculate_velocity_setpoint(
+        (10.0, 0.0, -10.0), 1.0, 5.0, 5.0
     )
     assert velocity == (5.0, 0.0, -5.0)
 

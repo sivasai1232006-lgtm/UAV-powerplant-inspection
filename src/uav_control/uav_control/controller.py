@@ -43,14 +43,9 @@ def calculate_velocity_setpoint(
     velocity_gain,
     active_max_velocity,
     max_velocity_limit,
-    horizontal_multiplier,
-    forward_speed_multiplier=1.5,
 ):
-    """Scale horizontal speed while preserving direction and vertical speed."""
-    horizontal_limit = min(
-        active_max_velocity * horizontal_multiplier,
-        max_velocity_limit,
-    )
+    """Cap horizontal and vertical speed while preserving direction."""
+    horizontal_limit = min(active_max_velocity, max_velocity_limit)
     horizontal_speed = math.hypot(error[0], error[1]) * velocity_gain
     if horizontal_speed > horizontal_limit:
         scale = horizontal_limit / horizontal_speed
@@ -60,19 +55,9 @@ def calculate_velocity_setpoint(
         )
     else:
         horizontal = (error[0], error[1])
-    horizontal_command = (
-        horizontal[0] * velocity_gain * forward_speed_multiplier,
-        horizontal[1] * velocity_gain * forward_speed_multiplier,
-    )
-    command_speed = math.hypot(*horizontal_command)
-    if command_speed > max_velocity_limit:
-        scale = max_velocity_limit / command_speed
-        horizontal_command = tuple(
-            value * scale for value in horizontal_command
-        )
     return (
-        horizontal_command[0],
-        horizontal_command[1],
+        horizontal[0] * velocity_gain,
+        horizontal[1] * velocity_gain,
         max(-active_max_velocity, min(active_max_velocity,
             error[2] * velocity_gain)),
     )
@@ -100,8 +85,6 @@ class OffboardController(Node):
         self.declare_parameter('goal_timeout_sec', 180.0)
         self.declare_parameter('velocity_gain', 1.0)
         self.declare_parameter('max_velocity_limit', 5.0)
-        self.declare_parameter('horizontal_velocity_multiplier', 1.2)
-        self.declare_parameter('forward_speed_multiplier', 1.5)
         self.declare_parameter('operating_bounds.enabled', False)
         self.declare_parameter('operating_bounds.x_min', 0.0)
         self.declare_parameter('operating_bounds.x_max', 0.0)
@@ -178,26 +161,6 @@ class OffboardController(Node):
                 'max_velocity_limit'
             ).get_parameter_value().double_value
         )
-        self.horizontal_velocity_multiplier = float(
-            self.get_parameter(
-                'horizontal_velocity_multiplier'
-            ).get_parameter_value().double_value
-        )
-        self.forward_speed_multiplier = float(
-            self.get_parameter(
-                'forward_speed_multiplier'
-            ).get_parameter_value().double_value
-        )
-        if (
-            not math.isfinite(self.horizontal_velocity_multiplier)
-            or self.horizontal_velocity_multiplier <= 0.0
-            or not math.isfinite(self.forward_speed_multiplier)
-            or self.forward_speed_multiplier <= 0.0
-        ):
-            raise ValueError(
-                'Horizontal and forward speed multipliers must be finite '
-                'and positive'
-            )
 
         if not all(math.isfinite(v) for v in (
             self.target_x,
@@ -351,8 +314,6 @@ class OffboardController(Node):
                 self.velocity_gain,
                 self.active_max_velocity,
                 self.max_velocity_limit,
-                self.horizontal_velocity_multiplier,
-                self.forward_speed_multiplier,
             ))
             msg.yaw = self.active_yaw_ned
         else:
