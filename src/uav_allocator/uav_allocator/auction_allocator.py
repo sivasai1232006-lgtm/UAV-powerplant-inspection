@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from functools import partial
 import time
 from typing import Any, Literal, cast
-
 import rclpy
 from nav_msgs.msg import Odometry
 from rclpy.node import Node
@@ -14,27 +13,18 @@ from sensor_msgs.msg import BatteryState
 from std_msgs.msg import Float64, String
 from uav_interfaces.msg import TaskStatus, UAVState
 from uav_interfaces.srv import AssignTask, GetUnassignedTasks
-
-from uav_allocator.battery_feasibility import (
-    BatteryFeasibility,
-    FeasibilityResult,
-)
+from uav_allocator.battery_feasibility import (BatteryFeasibility,FeasibilityResult,)
 from uav_allocator.cost_function import CostFunction
 from uav_allocator.path_cost_client import PathCostClient
 from uav_allocator.workload_estimator import WorkloadEstimator
 
-
 Position = tuple[float, float, float]
-
-
 @dataclass(frozen=True)
 class InspectionTask:
     task_id: str
     target_position: Position
     priority: int
     estimated_duration_sec: float
-
-
 @dataclass(frozen=True)
 class UavSnapshot:
     uav_id: str
@@ -49,8 +39,6 @@ class UavSnapshot:
     queued_tasks: tuple[InspectionTask, ...] = ()
     current_task_inspecting: bool = False
     remaining_inspection_sec: float = 0.0
-
-
 @dataclass(frozen=True)
 class AllocationDecision:
     task_id: str
@@ -59,8 +47,6 @@ class AllocationDecision:
     reason: str
     outbound_distance_m: float | None = None
     return_distance_m: float | None = None
-
-
 @dataclass
 class UavTelemetry:
     state: UAVState | None = None
@@ -68,33 +54,17 @@ class UavTelemetry:
     battery: BatteryState | None = None
     received_at: dict[str, float] = field(default_factory=dict)
 
-
 UavTelemetryKey = Literal['state', 'odometry', 'battery']
 TelemetryMessage = UAVState | Odometry | BatteryState
 
-
 class AuctionAllocator:
     completion_return_emergency_threshold_percentage: float
-
     def __init__(
         self,
-        path_cost,
-        workload_estimator,
-        battery_feasibility,
-        cost_function,
-        state_timeout_sec,
-        planning_batch_size=4,
-        maximum_workload_sec=1800.0,
-        workload_warning_sec=900.0,
-        battery_warning_margin_percentage=15.0,
-        future_lookahead_tasks=3,
-        minimum_separation_m=3.0,
-        recovery_position=None,
-        landing_energy_percentage=2.0,
-        landing_altitude_m=0.2,
-        post_landing_reserve_percentage=None,
-        cruise_altitude_m=7.0,
-    ):
+        path_cost, workload_estimator, battery_feasibility, cost_function, state_timeout_sec,
+        planning_batch_size=4, maximum_workload_sec=1800.0, workload_warning_sec=900.0, battery_warning_margin_percentage=15.0,
+        future_lookahead_tasks=3, minimum_separation_m=3.0, recovery_position=None, landing_energy_percentage=2.0, landing_altitude_m=0.2,
+        post_landing_reserve_percentage=None, cruise_altitude_m=7.0,):
         if state_timeout_sec <= 0.0:
             raise ValueError('State timeout must be greater than zero')
         self.path_cost = path_cost
@@ -107,9 +77,7 @@ class AuctionAllocator:
         self.planning_batch_size = int(planning_batch_size)
         self.maximum_workload_sec = float(maximum_workload_sec)
         self.workload_warning_sec = float(workload_warning_sec)
-        self.battery_warning_margin_percentage = float(
-            battery_warning_margin_percentage
-        )
+        self.battery_warning_margin_percentage = float(battery_warning_margin_percentage)
         self.future_lookahead_tasks = int(future_lookahead_tasks)
         self.minimum_separation_m = float(minimum_separation_m)
         self.recovery_position = recovery_position
@@ -139,18 +107,8 @@ class AuctionAllocator:
             )
         self.cruise_altitude_m = float(cruise_altitude_m)
 
-    def allocate(
-        self,
-        tasks,
-        uavs,
-        base_positions,
-        already_assigned_task_ids=(),
-        allowed_uav_ids_by_task=None,
-    ):
-        tasks = sorted(
-            tasks,
-            key=lambda task: (int(task.priority), str(task.task_id)),
-        )[:self.planning_batch_size]
+    def allocate(self,tasks,uavs,base_positions,already_assigned_task_ids=(),allowed_uav_ids_by_task=None,):
+        tasks = sorted(tasks,key=lambda task: (int(task.priority), str(task.task_id)),)[:self.planning_batch_size]
         uavs = list(uavs)
         assigned_task_ids = set(already_assigned_task_ids)
         decisions = []
@@ -164,9 +122,7 @@ class AuctionAllocator:
             for uav_id, position in base_positions.items()
         }
         self._allocation_homes = landing_homes
-        routes = {
-            uav.uav_id: self._existing_workload(uav) for uav in uavs
-        }
+        routes = {uav.uav_id: self._existing_workload(uav) for uav in uavs}
         snapshots = {uav.uav_id: uav for uav in uavs}
         committed_uav_ids = set()
         pending_tasks = []

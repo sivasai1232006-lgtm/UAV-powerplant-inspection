@@ -1,0 +1,6 @@
+Mission status: COMPLETED
+Run status: COMPLETED
+Total mission time: 557.40 s
+Inspection completion time: 395.50 s
+Tasks: 8 total, 8 completed, 0 failed, 0 cancelled, 0 unfinished
+Results: mission_metrics.json, task_results.csv

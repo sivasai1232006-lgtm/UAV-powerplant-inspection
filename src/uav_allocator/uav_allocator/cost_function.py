@@ -2,19 +2,9 @@ import math
 
 
 class CostFunction:
-    def __init__(
-        self,
-        weights,
-        distance_scale_m,
-        time_scale_sec,
-        energy_scale_percentage,
-        minimum_priority,
-        maximum_priority,
-    ):
+    def __init__(self,weights,distance_scale_m,time_scale_sec,energy_scale_percentage,minimum_priority,maximum_priority,):
         self.weights = dict(weights)
-        required_weights = {
-            'distance', 'time', 'energy', 'priority',
-        }
+        required_weights = {'distance', 'time', 'energy', 'priority'}
         optional_weights = {'battery', 'workload', 'future'}
         if not required_weights.issubset(self.weights) or not set(
             self.weights

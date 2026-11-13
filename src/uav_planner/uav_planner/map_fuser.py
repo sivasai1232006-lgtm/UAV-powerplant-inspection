@@ -1,21 +1,11 @@
-"""Fuse a 2D SLAM map with one altitude-specific structural grid."""
-
 import math
 from copy import deepcopy
-
 import rclpy
 from nav_msgs.msg import OccupancyGrid
 from rcl_interfaces.msg import SetParametersResult
 from rclpy.node import Node
-from rclpy.qos import (
-    DurabilityPolicy,
-    HistoryPolicy,
-    QoSProfile,
-    ReliabilityPolicy,
-)
-
+from rclpy.qos import (DurabilityPolicy,HistoryPolicy,QoSProfile,ReliabilityPolicy,)
 from uav_planner.map_generator import fuse_occupancy_grids
-
 
 def apply_xy_bounds(data, width, height, resolution, origin, bounds):
     bounded = list(data)
@@ -30,7 +20,6 @@ def apply_xy_bounds(data, width, height, resolution, origin, bounds):
             ):
                 bounded[row * width + column] = 100
     return bounded
-
 
 class AltitudeMapFuser(Node):
     def __init__(self):
@@ -208,7 +197,6 @@ class AltitudeMapFuser(Node):
 
             timer_holder['timer'] = self.create_timer(0.01, republish)
         return SetParametersResult(successful=True)
-
 
 def main(args=None):
     rclpy.init(args=args)

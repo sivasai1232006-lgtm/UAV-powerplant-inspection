@@ -1,12 +1,10 @@
 import math
 
-
 _WGS84_SEMI_MAJOR_M = 6378137.0
 _WGS84_FLATTENING = 1.0 / 298.257223563
 _WGS84_ECCENTRICITY_SQUARED = (
     _WGS84_FLATTENING * (2.0 - _WGS84_FLATTENING)
 )
-
 
 def _geodetic_to_ecef(latitude_deg, longitude_deg, altitude_m):
     latitude = math.radians(latitude_deg)
@@ -23,13 +21,11 @@ def _geodetic_to_ecef(latitude_deg, longitude_deg, altitude_m):
         * sin_latitude,
     )
 
-
 def _validate_geodetic(latitude_deg, longitude_deg):
     if not -90.0 <= latitude_deg <= 90.0:
         raise ValueError('Latitude must be between -90 and 90 degrees')
     if not -180.0 <= longitude_deg <= 180.0:
         raise ValueError('Longitude must be between -180 and 180 degrees')
-
 
 def _enu_basis(latitude_deg, longitude_deg):
     latitude = math.radians(latitude_deg)
@@ -38,7 +34,6 @@ def _enu_basis(latitude_deg, longitude_deg):
     cos_latitude = math.cos(latitude)
     sin_longitude = math.sin(longitude)
     cos_longitude = math.cos(longitude)
-    # Basis columns are the local East, North, and Up unit vectors in ECEF.
     return (
         (-sin_longitude, -sin_latitude * cos_longitude,
          cos_latitude * cos_longitude),
@@ -47,20 +42,16 @@ def _enu_basis(latitude_deg, longitude_deg):
         (0.0, cos_latitude, sin_latitude),
     )
 
-
 def _mat_vec(matrix, vector):
     return tuple(
         sum(row[index] * vector[index] for index in range(3))
         for row in matrix
     )
 
-
 def _transpose(matrix):
     return tuple(zip(*matrix))
 
-
 def rotation_matrix_to_quaternion(matrix):
-    """Return a normalized (w, x, y, z) quaternion for a 3x3 rotation."""
     trace = matrix[0][0] + matrix[1][1] + matrix[2][2]
     if trace > 0.0:
         scale = math.sqrt(trace + 1.0) * 2.0
@@ -103,27 +94,16 @@ def rotation_matrix_to_quaternion(matrix):
     norm = math.sqrt(sum(value * value for value in result))
     return tuple(value / norm for value in result)
 
-
 def local_enu_yaw_in_map(rotation):
-    """Return the local ENU east-axis heading expressed in map ENU."""
     return math.atan2(rotation[1][0], rotation[0][0])
 
-
 def _rotate_basis_vector(basis, vector):
-    # basis is ECEF rows and local ENU axes columns.
     return tuple(
         sum(basis[row][column] * vector[column] for column in range(3))
         for row in range(3)
     )
 
-
-def local_enu_to_map_rotation(
-    reference_latitude_deg,
-    reference_longitude_deg,
-    map_latitude_deg,
-    map_longitude_deg,
-):
-    """Return the rotation matrix mapping local-origin ENU vectors to map."""
+def local_enu_to_map_rotation(reference_latitude_deg, reference_longitude_deg, map_latitude_deg, map_longitude_deg,):
     _validate_geodetic(reference_latitude_deg, reference_longitude_deg)
     _validate_geodetic(map_latitude_deg, map_longitude_deg)
     map_basis = _enu_basis(map_latitude_deg, map_longitude_deg)
@@ -137,132 +117,46 @@ def local_enu_to_map_rotation(
         for row in range(3)
     )
 
-
-def local_origin_to_map(
-    reference_latitude_deg,
-    reference_longitude_deg,
-    reference_altitude_m,
-    map_latitude_deg,
-    map_longitude_deg,
-    map_altitude_m,
-):
-    """Express PX4's geodetic local NED origin in the shared ENU map."""
-    return gps_to_gazebo_enu(
-        reference_latitude_deg,
-        reference_longitude_deg,
-        reference_altitude_m,
-        map_latitude_deg,
-        map_longitude_deg,
-        map_altitude_m,
-    )
-
+def local_origin_to_map(reference_latitude_deg, reference_longitude_deg, reference_altitude_m, map_latitude_deg, map_longitude_deg, map_altitude_m):
+    return gps_to_gazebo_enu(reference_latitude_deg,reference_longitude_deg,reference_altitude_m,map_latitude_deg,map_longitude_deg,map_altitude_m,)
 
 def local_ned_to_map(
-    north_m,
-    east_m,
-    down_m,
-    reference_latitude_deg,
-    reference_longitude_deg,
-    reference_altitude_m,
-    map_latitude_deg,
-    map_longitude_deg,
-    map_altitude_m,
-):
-    """Transform a PX4 local NED point into the shared Cartesian ENU map."""
-    coordinates = (
-        north_m, east_m, down_m, reference_latitude_deg,
-        reference_longitude_deg, reference_altitude_m,
-        map_latitude_deg, map_longitude_deg, map_altitude_m,
-    )
+    north_m,east_m, down_m, reference_latitude_deg, reference_longitude_deg, reference_altitude_m, map_latitude_deg, map_longitude_deg, map_altitude_m,):
+    coordinates = ( north_m, east_m, down_m, reference_latitude_deg, reference_longitude_deg, reference_altitude_m, map_latitude_deg, map_longitude_deg, map_altitude_m,)
     if not all(math.isfinite(float(value)) for value in coordinates):
-        raise ValueError(
-            'NED coordinates and geodetic references must be finite'
-        )
+        raise ValueError('NED coordinates and geodetic references must be finite')
     _validate_geodetic(reference_latitude_deg, reference_longitude_deg)
     _validate_geodetic(map_latitude_deg, map_longitude_deg)
-    local_origin = _geodetic_to_ecef(
-        reference_latitude_deg,
-        reference_longitude_deg,
-        reference_altitude_m,
-    )
-    map_origin = _geodetic_to_ecef(
-        map_latitude_deg, map_longitude_deg, map_altitude_m
-    )
+    local_origin = _geodetic_to_ecef( reference_latitude_deg, reference_longitude_deg, reference_altitude_m )
+    map_origin = _geodetic_to_ecef( map_latitude_deg, map_longitude_deg, map_altitude_m)
     local_enu = (east_m, north_m, -down_m)
     local_basis = _enu_basis(reference_latitude_deg, reference_longitude_deg)
     point_ecef = tuple(
-        local_origin[axis]
-        + sum(local_basis[axis][column] * local_enu[column]
-              for column in range(3))
-        - map_origin[axis]
-        for axis in range(3)
-    )
-    return _mat_vec(
-        _transpose(_enu_basis(map_latitude_deg, map_longitude_deg)),
-        point_ecef,
-    )
+        local_origin[axis] + sum(local_basis[axis][column] * local_enu[column] for column in range(3)) - map_origin[axis] for axis in range(3) )
+    return _mat_vec(_transpose(_enu_basis(map_latitude_deg, map_longitude_deg)), point_ecef,)
 
 
-def map_to_local_ned(
-    east_m,
-    north_m,
-    up_m,
-    reference_latitude_deg,
-    reference_longitude_deg,
-    reference_altitude_m,
-    map_latitude_deg,
-    map_longitude_deg,
-    map_altitude_m,
-):
-    """Transform a Cartesian ENU map point into PX4 local NED coordinates."""
+def map_to_local_ned(east_m, north_m, up_m, reference_latitude_deg, reference_longitude_deg, reference_altitude_m, map_latitude_deg, map_longitude_deg,  map_altitude_m,):
     coordinates = (
         east_m, north_m, up_m, reference_latitude_deg,
         reference_longitude_deg, reference_altitude_m,
         map_latitude_deg, map_longitude_deg, map_altitude_m,
     )
     if not all(math.isfinite(float(value)) for value in coordinates):
-        raise ValueError(
-            'Map coordinates and geodetic references must be finite'
-        )
+        raise ValueError('Map coordinates and geodetic references must be finite' )
     _validate_geodetic(reference_latitude_deg, reference_longitude_deg)
     _validate_geodetic(map_latitude_deg, map_longitude_deg)
-    map_origin = _geodetic_to_ecef(
-        map_latitude_deg, map_longitude_deg, map_altitude_m
-    )
-    local_origin = _geodetic_to_ecef(
-        reference_latitude_deg,
-        reference_longitude_deg,
-        reference_altitude_m,
-    )
+    map_origin = _geodetic_to_ecef(map_latitude_deg, map_longitude_deg, map_altitude_m)
+    local_origin = _geodetic_to_ecef(reference_latitude_deg, reference_longitude_deg, reference_altitude_m,)
     map_basis = _enu_basis(map_latitude_deg, map_longitude_deg)
     local_basis = _enu_basis(reference_latitude_deg, reference_longitude_deg)
-    map_offset_ecef = _rotate_basis_vector(
-        map_basis, (east_m, north_m, up_m)
-    )
-    delta_ecef = tuple(
-        map_origin[axis] + map_offset_ecef[axis] - local_origin[axis]
-        for axis in range(3)
-    )
+    map_offset_ecef = _rotate_basis_vector( map_basis, (east_m, north_m, up_m))
+    delta_ecef = tuple( map_origin[axis] + map_offset_ecef[axis] - local_origin[axis] for axis in range(3))
     local_enu = _mat_vec(_transpose(local_basis), delta_ecef)
     return local_enu[1], local_enu[0], -local_enu[2]
 
-
-def gps_to_gazebo_enu(
-    latitude_deg,
-    longitude_deg,
-    altitude_m,
-    reference_latitude_deg,
-    reference_longitude_deg,
-    reference_altitude_m,
-):
-    values = (
-        latitude_deg,
-        longitude_deg,
-        altitude_m,
-        reference_latitude_deg,
-        reference_longitude_deg,
-        reference_altitude_m,
-    )
+def gps_to_gazebo_enu(latitude_deg, longitude_deg, altitude_m, reference_latitude_deg, reference_longitude_deg, reference_altitude_m):
+    values = (latitude_deg, longitude_deg, altitude_m, reference_latitude_deg, reference_longitude_deg, reference_altitude_m,)
     if not all(math.isfinite(value) for value in values):
         raise ValueError('GPS coordinates and reference must be finite')
     if not -90.0 <= latitude_deg <= 90.0:
@@ -287,9 +181,7 @@ def gps_to_gazebo_enu(
         longitude_rad = math.radians(longitude)
         sin_latitude = math.sin(latitude_rad)
         cos_latitude = math.cos(latitude_rad)
-        prime_vertical_radius = earth_radius_m / math.sqrt(
-            1.0 - eccentricity_squared * sin_latitude**2
-        )
+        prime_vertical_radius = earth_radius_m / math.sqrt(1.0 - eccentricity_squared * sin_latitude**2)
         return (
             (prime_vertical_radius + altitude)
             * cos_latitude
@@ -302,15 +194,8 @@ def gps_to_gazebo_enu(
         )
 
     point_ecef = to_ecef(latitude_deg, longitude_deg, altitude_m)
-    reference_ecef = to_ecef(
-        reference_latitude_deg,
-        reference_longitude_deg,
-        reference_altitude_m,
-    )
-    delta_x, delta_y, delta_z = (
-        point - reference
-        for point, reference in zip(point_ecef, reference_ecef)
-    )
+    reference_ecef = to_ecef(reference_latitude_deg,reference_longitude_deg,reference_altitude_m,)
+    delta_x, delta_y, delta_z = (point - reference for point, reference in zip(point_ecef, reference_ecef))
 
     reference_latitude_rad = math.radians(reference_latitude_deg)
     reference_longitude_rad = math.radians(reference_longitude_deg)

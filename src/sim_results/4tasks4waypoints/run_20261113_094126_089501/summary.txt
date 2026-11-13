@@ -1,0 +1,9 @@
+Offline estimated allocation and route comparison; no mission was executed.
+Tasks: 4 (pre-marked infeasible: 0); waypoints: 4
+All algorithms use the same task set, route evaluator, battery model, workload/capacity/separation and operating-bound constraints, and base/UGV return policy.
+
+algorithm | feasibility | assigned | unassigned | allocation sec | estimated mission sec | estimated distance m | estimated energy %
+----------------------------------------------------------------------------------------------------------------------
+existing_algorithm | FEASIBLE | 4 | 0 | 0.000332 | 300.82 | 404.68 | 24.39
+milp | FEASIBLE | 4 | 0 | 0.247097 | 242.12 | 299.02 | 19.11
+greedy | FEASIBLE | 4 | 0 | 0.000200 | 246.74 | 307.34 | 19.53

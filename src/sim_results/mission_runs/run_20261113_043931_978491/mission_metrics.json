@@ -1,0 +1,157 @@
+{
+  "inspection_completion_time_sec": 395.5,
+  "inspection_time_sec": 76.0,
+  "mission_failed_reasons": {},
+  "mission_status": "COMPLETED",
+  "mission_time_sec": 557.4,
+  "navigation_failures": 0,
+  "planned_distance_m": 1887.5096243136506,
+  "planning_time_sec": 0.31826985399993646,
+  "replan_count": 52,
+  "return_distance_m": 163.96974160846273,
+  "run_status": "COMPLETED",
+  "saved_at_utc": "2026-11-13T04:39:31.978439+00:00",
+  "schema_version": 1,
+  "started_at_utc": "2026-11-13T04:30:14.545130+00:00",
+  "task_counts": {
+    "cancelled": 0,
+    "completed": 8,
+    "failed": 0,
+    "total": 8,
+    "unfinished": 0
+  },
+  "tasks": [
+    {
+      "assigned_uav": "uav_2",
+      "estimated_duration_sec": 10.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "COMPLETED",
+      "task_id": "TRANFORMER",
+      "x_m": 2.0,
+      "y_m": 20.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "uav_1",
+      "estimated_duration_sec": 15.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "COMPLETED",
+      "task_id": "POWER_CELLS",
+      "x_m": -15.0,
+      "y_m": 20.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "uav_2",
+      "estimated_duration_sec": 12.0,
+      "failure_reason": "",
+      "priority": 2,
+      "status": "COMPLETED",
+      "task_id": "BUILDING_NORTH_VIEW",
+      "x_m": -12.0,
+      "y_m": 35.0,
+      "z_m": 7.0
+    },
+    {
+      "assigned_uav": "uav_1",
+      "estimated_duration_sec": 8.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "COMPLETED",
+      "task_id": "POWER_GENERATOR",
+      "x_m": 6.0,
+      "y_m": -30.0,
+      "z_m": 3.0
+    },
+    {
+      "assigned_uav": "uav_1",
+      "estimated_duration_sec": 6.0,
+      "failure_reason": "",
+      "priority": 3,
+      "status": "COMPLETED",
+      "task_id": "POLES",
+      "x_m": -28.0,
+      "y_m": -10.0,
+      "z_m": 7.0
+    },
+    {
+      "assigned_uav": "uav_2",
+      "estimated_duration_sec": 10.0,
+      "failure_reason": "",
+      "priority": 4,
+      "status": "COMPLETED",
+      "task_id": "OPEN_AREA",
+      "x_m": -25.0,
+      "y_m": -55.0,
+      "z_m": 7.0
+    },
+    {
+      "assigned_uav": "uav_1",
+      "estimated_duration_sec": 5.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "COMPLETED",
+      "task_id": "MIDDLE_LINE",
+      "x_m": -3.0,
+      "y_m": -60.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "uav_2",
+      "estimated_duration_sec": 10.0,
+      "failure_reason": "",
+      "priority": 3,
+      "status": "COMPLETED",
+      "task_id": "BUILDING_WEST_VIEW",
+      "x_m": -27.5,
+      "y_m": 45.0,
+      "z_m": 5.0
+    }
+  ],
+  "total_distance_m": 564.4175367372156,
+  "travel_time_sec": 960.2565347290019,
+  "uavs": {
+    "uav_1": {
+      "distance_m": 266.81441559039655,
+      "energy_consumed_wh": 0.0,
+      "final_battery_percent": 99.99465942382812,
+      "final_estimated_battery_percent": 99.99465942382812,
+      "final_position_m": [
+        -4.958607122590512,
+        -0.06940075254213297,
+        0.260522229250776
+      ],
+      "initial_battery_percent": 99.99465942382812,
+      "initial_estimated_battery_percent": 99.99465942382812,
+      "return_failure_reason": "",
+      "return_status": "LANDED",
+      "takeoff_position_m": [
+        -4.9986836674239585,
+        0.020626650742736424,
+        0.21066628015611572
+      ]
+    },
+    "uav_2": {
+      "distance_m": 297.60312114681903,
+      "energy_consumed_wh": 0.0,
+      "final_battery_percent": 50.00267028808594,
+      "final_estimated_battery_percent": 50.00267028808594,
+      "final_position_m": [
+        4.976585180351728,
+        -0.018984167820594977,
+        0.22800867120638227
+      ],
+      "initial_battery_percent": 99.99465942382812,
+      "initial_estimated_battery_percent": 99.99465942382812,
+      "return_failure_reason": "",
+      "return_status": "LANDED",
+      "takeoff_position_m": [
+        5.008682816810605,
+        -0.005561133556048092,
+        0.2186554707639939
+      ]
+    }
+  }
+}

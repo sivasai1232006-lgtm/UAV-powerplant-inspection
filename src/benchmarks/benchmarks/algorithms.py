@@ -1,15 +1,8 @@
-"""Allocation algorithms evaluated with one shared route and feasibility model."""
-
 from dataclasses import asdict, dataclass, field
 import math
 import time
-
-from uav_allocator.auction_allocator import (
-    AuctionAllocator,
-    UavSnapshot,
-)
+from uav_allocator.auction_allocator import (AuctionAllocator,UavSnapshot,)
 from uav_interfaces.msg import UAVState
-
 
 @dataclass
 class Evaluation:
@@ -26,7 +19,6 @@ class Evaluation:
     violations: list
     return_choices: dict = field(default_factory=dict)
 
-
 def _initial_metrics(uavs):
     return {
         'distance': {u.uav_id: 0.0 for u in uavs},
@@ -36,46 +28,28 @@ def _initial_metrics(uavs):
         'battery': {u.uav_id: float(u.battery_percentage) for u in uavs},
     }
 
-
 def _eligible(allocator, uavs, operating_bounds=None):
     return [
         u for u in uavs
-        if allocator._eligible(u)[0]
-        and (
-            operating_bounds is None
-            or u.uav_id not in operating_bounds
-            or operating_bounds[u.uav_id].contains(u.position)
-        )
-    ]
-
+        if allocator._eligible(u)[0]and (operating_bounds is None or u.uav_id not in operating_bounds or operating_bounds[u.uav_id].contains(u.position))]
 
 def _objective_distance_bound(allocator, tasks, uavs, homes):
     points = [tuple(uav.position) for uav in uavs]
     points.extend(tuple(task.target_position) for task in tasks)
-    points.extend(
-        tuple(position) for position in homes.values()
-        if position is not None
-    )
+    points.extend(tuple(position) for position in homes.values() if position is not None)
     if allocator.recovery_position is not None:
         points.append(tuple(allocator.recovery_position))
     valid_distances = []
     for start in points:
         for goal in points:
             distance = allocator.path_cost.estimate_distance(start, goal)
-            if (
-                distance is not None and math.isfinite(distance)
-                and distance >= 0.0
-            ):
+            if (distance is not None and math.isfinite(distance)and distance >= 0.0):
                 valid_distances.append(distance)
     maximum_leg = max(valid_distances, default=0.0)
     return maximum_leg * (len(tasks) + len(uavs))
 
 
-def _plan_metrics(
-    allocator, tasks, uavs, homes, assignments, max_tasks_per_uav=None,
-    operating_bounds=None,
-):
-    """Estimate a route and enforce the same mission constraints for all methods."""
+def _plan_metrics(allocator, tasks, uavs, homes, assignments, max_tasks_per_uav=None,operating_bounds=None,):
     task_by_id = {task.task_id: task for task in tasks}
     uav_by_id = {uav.uav_id: uav for uav in uavs}
     capacity = max_tasks_per_uav or max(len(tasks), 1)
@@ -100,16 +74,9 @@ def _plan_metrics(
         if not allocator._eligible(uav_by_id[uav_id])[0]:
             violations.append(f'{uav_id} is unavailable for task {task_id}')
             continue
-        bounds = (
-            operating_bounds.get(uav_id)
-            if operating_bounds is not None else None
-        )
-        if bounds is not None and not bounds.contains(
-            task_by_id[task_id].target_position
-        ):
-            violations.append(
-                f'{uav_id} task goal for {task_id} is outside operating bounds'
-            )
+        bounds = (operating_bounds.get(uav_id)if operating_bounds is not None else None)
+        if bounds is not None and not bounds.contains(task_by_id[task_id].target_position):
+            violations.append(f'{uav_id} task goal for {task_id} is outside operating bounds')
             continue
         row['priority'] = int(task_by_id[task_id].priority)
         row['status'] = 'assigned_not_executed'
@@ -119,12 +86,8 @@ def _plan_metrics(
 
     for uav_id, route in route_rows.items():
         if len(route) > capacity:
-            violations.append(
-                f'{uav_id} exceeds max_tasks_per_uav ({len(route)} > {capacity})'
-            )
+            violations.append(f'{uav_id} exceeds max_tasks_per_uav ({len(route)} > {capacity})')
 
-    # Keep the live allocator's rule: close inspections may share one UAV,
-    # but cannot be split between different UAVs.
     for first_index, first in enumerate(normalized):
         for second in normalized[first_index + 1:]:
             if first['uav_id'] == second['uav_id']:
@@ -132,25 +95,18 @@ def _plan_metrics(
             a = task_by_id[first['task_id']].target_position
             b = task_by_id[second['task_id']].target_position
             if math.dist(a, b) < allocator.minimum_separation_m:
-                violations.append(
-                    'minimum separation violated by tasks '
-                    f"{first['task_id']} and {second['task_id']}"
-                )
+                violations.append('minimum separation violated by tasks 'f"{first['task_id']} and {second['task_id']}")
 
     distance_by_uav = {u.uav_id: 0.0 for u in uavs}
     energy_by_uav = {u.uav_id: 0.0 for u in uavs}
-    remaining_by_uav = {
-        u.uav_id: float(u.battery_percentage) for u in uavs
-    }
+    remaining_by_uav = {u.uav_id: float(u.battery_percentage) for u in uavs}
     workload_by_uav = {u.uav_id: 0.0 for u in uavs}
     inspection_by_uav = {u.uav_id: 0.0 for u in uavs}
     return_choices = {}
     enriched_rows = {row['task_id']: row for row in normalized}
     min_reserve = allocator.battery_feasibility.minimum_reserve_percentage
     consumption_per_meter = allocator.battery_feasibility.consumption_per_meter
-    inspection_per_minute = (
-        allocator.battery_feasibility.inspection_consumption_per_minute
-    )
+    inspection_per_minute = (allocator.battery_feasibility.inspection_consumption_per_minute)
     landing_energy = float(getattr(allocator, 'landing_energy_percentage', 0.0))
     speed = allocator.workload_estimator.nominal_speed_mps
 
@@ -169,9 +125,7 @@ def _plan_metrics(
                 0.0,
             )
             if leg is None or not math.isfinite(leg) or leg < 0.0:
-                violations.append(
-                    f'route distance unavailable for {uav.uav_id}/{task.task_id}'
-                )
+                violations.append(f'route distance unavailable for {uav.uav_id}/{task.task_id}')
                 leg = 0.0
             outbound_distance += leg
             inspection_duration += float(task.estimated_duration_sec)
@@ -181,26 +135,14 @@ def _plan_metrics(
                 + float(task.estimated_duration_sec) / 60.0
                 * inspection_per_minute
             )
-            row['estimated_workload_sec'] = (
-                leg / speed + float(task.estimated_duration_sec)
-            )
+            row['estimated_workload_sec'] = (leg / speed + float(task.estimated_duration_sec))
             position = tuple(task.target_position)
 
-        service_energy = (
-            inspection_duration / 60.0 * inspection_per_minute
-        )
+        service_energy = (inspection_duration / 60.0 * inspection_per_minute)
         base = homes.get(uav.uav_id)
-        bounds = (
-            operating_bounds.get(uav.uav_id)
-            if operating_bounds is not None else None
-        )
-        base_in_bounds = (
-            bounds is None or bounds.contains(base or ())
-        )
-        base_distance = (
-            allocator.path_cost.estimate_distance(position, base)
-            if base is not None and base_in_bounds else None
-        )
+        bounds = (operating_bounds.get(uav.uav_id)if operating_bounds is not None else None)
+        base_in_bounds = (bounds is None or bounds.contains(base or ()))
+        base_distance = (allocator.path_cost.estimate_distance(position, base)if base is not None and base_in_bounds else None)
         base_remaining = None
         if base_distance is not None and math.isfinite(base_distance):
             base_energy = (
@@ -213,14 +155,8 @@ def _plan_metrics(
         selected_distance = base_distance
         if base_remaining is None or base_remaining < min_reserve:
             recovery = allocator.recovery_position
-            recovery_in_bounds = (
-                recovery is not None
-                and (bounds is None or bounds.contains(recovery))
-            )
-            recovery_distance = (
-                allocator.path_cost.estimate_distance(position, recovery)
-                if recovery_in_bounds else None
-            )
+            recovery_in_bounds = (recovery is not None and (bounds is None or bounds.contains(recovery)))
+            recovery_distance = (allocator.path_cost.estimate_distance(position, recovery)if recovery_in_bounds else None)
             recovery_remaining = None
             if recovery_distance is not None and math.isfinite(recovery_distance):
                 recovery_energy = (
@@ -228,44 +164,20 @@ def _plan_metrics(
                     * consumption_per_meter
                     + service_energy + landing_energy
                 )
-                recovery_remaining = (
-                    float(uav.battery_percentage) - recovery_energy
-                )
-            required_reserve = max(
-                min_reserve,
-                float(getattr(
-                    allocator,
-                    'completion_return_emergency_threshold_percentage',
-                    5.0,
-                )),
+                recovery_remaining = (float(uav.battery_percentage) - recovery_energy)
+            required_reserve = max(min_reserve,float(getattr(allocator,'completion_return_emergency_threshold_percentage',20.0,)),
             )
-            if (
-                recovery_remaining is not None
-                and recovery_remaining >= required_reserve
-            ):
+            if (recovery_remaining is not None and recovery_remaining >= required_reserve):
                 selected_name = 'UGV'
                 selected_distance = recovery_distance
             else:
-                violations.append(
-                    f'battery: {uav.uav_id} cannot safely return to base '
-                    'or the configured UGV'
-                )
+                violations.append(f'battery: {uav.uav_id} cannot safely return to base ''or the configured UGV')
                 # Retain the preferred base estimate for diagnostics only.
                 selected_name = 'takeoff_position'
                 selected_distance = base_distance or 0.0
-        return_position = (
-            allocator.recovery_position
-            if selected_name == 'UGV'
-            else homes.get(uav.uav_id)
-        )
-        if bounds is not None and (
-            not bounds.contains(uav.position)
-            or not bounds.contains(return_position or ())
-        ):
-            violations.append(
-                f'{uav.uav_id} route start or return goal is outside '
-                'operating bounds'
-            )
+        return_position = (allocator.recovery_position if selected_name == 'UGV'else homes.get(uav.uav_id))
+        if bounds is not None and (not bounds.contains(uav.position)or not bounds.contains(return_position or ())):
+            violations.append(f'{uav.uav_id} route start or return goal is outside ''operating bounds')
 
         if selected_distance is None or not math.isfinite(selected_distance):
             violations.append(f'return distance unavailable for {uav.uav_id}')
@@ -278,22 +190,14 @@ def _plan_metrics(
                 f'battery reserve violated by {uav.uav_id}: '
                 f'{final_battery:.3f}% < {min_reserve:.3f}%'
             )
-        # The mission runs from takeoff to landing. Attribute the final
-        # return leg to the last task so summing per-task workload gives the
-        # complete UAV mission duration (outbound travel + inspections + return).
+
         if route:
             final_task_row = enriched_rows[route[-1]['task_id']]
             final_task_row['estimated_distance_m'] += float(selected_distance)
-            final_task_row['estimated_energy_percent'] += (
-                float(selected_distance) * consumption_per_meter
-            )
-            final_task_row['estimated_workload_sec'] += (
-                float(selected_distance) / speed
-            )
+            final_task_row['estimated_energy_percent'] += (float(selected_distance) * consumption_per_meter)
+            final_task_row['estimated_workload_sec'] += (float(selected_distance) / speed)
 
-        workload = sum(
-            float(row.get('estimated_workload_sec', 0.0)) for row in route
-        )
+        workload = sum(float(row.get('estimated_workload_sec', 0.0)) for row in route)
         if workload > allocator.maximum_workload_sec + 1e-8:
             violations.append(
                 f'workload limit violated by {uav.uav_id}: '
@@ -324,22 +228,12 @@ def _plan_metrics(
     }
 
 
-def _make_evaluation(
-    allocator, name, started, tasks, uavs, homes, assignments, reasons,
-    solver, max_tasks_per_uav=None, status='completed',
-    allocation_time_sec=None, operating_bounds=None,
-):
-    metrics = _plan_metrics(
-        allocator, tasks, uavs, homes, assignments, max_tasks_per_uav,
-        operating_bounds,
-    )
+def _make_evaluation(allocator, name, started, tasks, uavs, homes, assignments, reasons,solver, max_tasks_per_uav=None, status='completed',allocation_time_sec=None, operating_bounds=None):
+    metrics = _plan_metrics(allocator, tasks, uavs, homes, assignments, max_tasks_per_uav,operating_bounds,)
     return Evaluation(
         name=name,
         status=status,
-        allocation_time_sec=(
-            time.perf_counter() - started
-            if allocation_time_sec is None else allocation_time_sec
-        ),
+        allocation_time_sec=(time.perf_counter() - started if allocation_time_sec is None else allocation_time_sec),
         assignments=metrics['assignments'],
         reasons=reasons,
         solver=solver,
@@ -352,11 +246,7 @@ def _make_evaluation(
     )
 
 
-def run_existing(
-    allocator: AuctionAllocator, tasks, uavs, homes, max_tasks_per_uav=None,
-    operating_bounds=None,
-):
-    """Simulate successive auction cycles as assigned tasks are completed."""
+def run_existing(allocator: AuctionAllocator, tasks, uavs, homes, max_tasks_per_uav=None,operating_bounds=None,):
     started = time.perf_counter()
     remaining = list(tasks)
     task_by_id = {task.task_id: task for task in tasks}
@@ -377,13 +267,8 @@ def run_existing(
                         uav_id in states
                         and bounds.contains(states[uav_id].position)
                         and bounds.contains(task.target_position)
-                        and (
-                            bounds.contains(homes.get(uav_id, ()))
-                            or (
-                                allocator.recovery_position is not None
-                                and bounds.contains(
-                                    allocator.recovery_position
-                                )
+                        and (bounds.contains(homes.get(uav_id, ()))
+                            or (allocator.recovery_position is not None and bounds.contains(allocator.recovery_position)
                             )
                         )
                     )
@@ -405,15 +290,9 @@ def run_existing(
         for decision in accepted:
             task = task_by_id[decision.task_id]
             uav = states[decision.uav_id]
-            travel_distance = allocator.path_cost.estimate_distance(
-                uav.position, task.target_position, uav.yaw, 0.0
-            )
+            travel_distance = allocator.path_cost.estimate_distance(uav.position, task.target_position, uav.yaw, 0.0)
             energy_used = (
-                travel_distance
-                * allocator.battery_feasibility.consumption_per_meter
-                + task.estimated_duration_sec / 60.0
-                * allocator.battery_feasibility.inspection_consumption_per_minute
-            )
+                travel_distance* allocator.battery_feasibility.consumption_per_meter+ task.estimated_duration_sec / 60.0* allocator.battery_feasibility.inspection_consumption_per_minute)
             assignments.append({
                 'task_id': task.task_id,
                 'uav_id': uav.uav_id,
@@ -427,19 +306,12 @@ def run_existing(
                 battery_percentage=float(uav.battery_percentage - energy_used),
                 connected=uav.connected,
                 operational=uav.operational,
-                mission_status=(
-                    UAVState.ASSIGNED
-                    if task_counts[uav.uav_id] >= capacity
-                    else UAVState.IDLE
-                ),
+                mission_status=(UAVState.ASSIGNED if task_counts[uav.uav_id] >= capacity else UAVState.IDLE),
                 state_age_sec=0.0,
                 yaw=uav.yaw,
             )
             reasons.pop(task.task_id, None)
-            remaining = [
-                candidate for candidate in remaining
-                if candidate.task_id != task.task_id
-            ]
+            remaining = [candidate for candidate in remaining if candidate.task_id != task.task_id]
 
     for task in remaining:
         reasons.setdefault(task.task_id, 'existing allocator left task unassigned')
@@ -454,92 +326,47 @@ def run_existing(
     )
 
 
-def run_greedy(
-    allocator: AuctionAllocator, tasks, uavs, homes, max_tasks_per_uav=None,
-    operating_bounds=None,
-):
-    """Allocate priority-ordered tasks while balancing complete UAV mission times."""
+def run_greedy(allocator: AuctionAllocator, tasks, uavs, homes, max_tasks_per_uav=None,operating_bounds=None,):
     started = time.perf_counter()
     capacity = max_tasks_per_uav or max(len(tasks), 1)
     eligible = _eligible(allocator, uavs, operating_bounds)
     assignments, reasons = [], {}
     counts = {u.uav_id: 0 for u in uavs}
 
-    # A fixed priority order makes this a simple, deterministic greedy
-    # heuristic. Task ID provides a stable tie-break for equal priorities.
-    ordered_tasks = sorted(
-        tasks, key=lambda task: (-int(task.priority), str(task.task_id))
-    )
-
-    # Evaluate the empty plan once. Each candidate is compared with this
-    # accepted plan, so the score is the marginal change in total route length.
-    current_metrics = _plan_metrics(
-        allocator, tasks, uavs, homes, assignments, capacity,
-        operating_bounds,
-    )
+    ordered_tasks = sorted(tasks, key=lambda task: (-int(task.priority), str(task.task_id)))
+    current_metrics = _plan_metrics(allocator, tasks, uavs, homes, assignments, capacity,operating_bounds,)
 
     for task in ordered_tasks:
         choices = []
         rejected = []
-
         for uav in eligible:
             uav_id = uav.uav_id
             if counts[uav_id] >= capacity:
                 continue
-
             proposal = assignments + [{
                 'task_id': task.task_id,
                 'uav_id': uav_id,
                 'priority': task.priority,
                 'bid': 0.0,
             }]
-            candidate_metrics = _plan_metrics(
-                allocator, tasks, uavs, homes, proposal, capacity,
-                operating_bounds,
-            )
-
+            candidate_metrics = _plan_metrics(allocator, tasks, uavs, homes, proposal, capacity,operating_bounds,)
             if candidate_metrics['violations']:
                 rejected.append(candidate_metrics['violations'][0])
                 continue
 
-            # Primary criterion: minimize projected team makespan. Each UAV
-            # workload includes its complete takeoff-to-landing route, including
-            # the selected return leg.
             projected_makespan = candidate_metrics['makespan']
-
             # Balance mission durations without forcing equal task counts.
             projected_workloads = candidate_metrics['workload']
-            workload_imbalance = sum(
-                float(workload_sec) ** 2
-                for workload_sec in projected_workloads.values()
-            )
-
+            workload_imbalance = sum(float(workload_sec) ** 2for workload_sec in projected_workloads.values())
             # Distance and energy remain important secondary criteria.
-            choices.append((
-                projected_makespan,
-                workload_imbalance,
-                candidate_metrics['total_distance'],
-                candidate_metrics['total_energy'],
-                str(uav_id),
-                uav_id,
-                proposal,
-                candidate_metrics,
-            ))
+            choices.append((projected_makespan,workload_imbalance, candidate_metrics['total_distance'],candidate_metrics['total_energy'],str(uav_id),uav_id,
+                proposal,candidate_metrics,))
 
         if not choices:
-            reasons[task.task_id] = (
-                rejected[0] if rejected
-                else 'no available UAV satisfies the shared route constraints'
-            )
+            reasons[task.task_id] = (rejected[0] if rejected else 'no available UAV satisfies the shared route constraints')
             continue
-
-        # Choose the assignment with the lowest projected team makespan.
-        # Workload balance, distance, energy, and UAV ID are tie-breakers.
-        (
-            _projected_makespan, _workload_imbalance, _total_distance,
-            _total_energy, _uav_sort_key, selected_uav_id,
-            assignments, current_metrics,
-        ) = min(choices, key=lambda choice: choice[:5])
+        (_projected_makespan, _workload_imbalance, _total_distance,
+         _total_energy, _uav_sort_key, selected_uav_id,assignments, current_metrics,) = min(choices, key=lambda choice: choice[:5])
         counts[selected_uav_id] += 1
 
     allocation_time_sec = time.perf_counter() - started
@@ -556,19 +383,12 @@ def run_greedy(
     )
 
 
-def run_milp(
-    allocator: AuctionAllocator, tasks, uavs, homes,
-    time_limit_sec=10.0, max_tasks_per_uav=None,
-    operating_bounds=None,
-):
-    """Solve a coverage-first, bounded route-ordering and assignment MILP."""
+def run_milp(allocator: AuctionAllocator, tasks, uavs, homes,time_limit_sec=10.0, max_tasks_per_uav=None,operating_bounds=None,):
     started = time.perf_counter()
     try:
         import pulp
     except ImportError as error:
-        return _failed(
-            'milp', started, tasks, uavs, 'solver_unavailable', str(error)
-        )
+        return _failed('milp', started, tasks, uavs, 'solver_unavailable', str(error))
 
     eligible = _eligible(allocator, uavs, operating_bounds)
     task_count = len(tasks)
@@ -576,15 +396,9 @@ def run_milp(
         return _make_evaluation(
             allocator, 'milp', started, tasks, uavs, homes, [], {},
             {'name': 'PuLP MILP', 'incumbent_available': True},
-            max_tasks_per_uav,
-            status='completed',
-            operating_bounds=operating_bounds,
-        )
+            max_tasks_per_uav,status='completed',operating_bounds=operating_bounds,)
     if not eligible:
-        return _failed(
-            'milp', started, tasks, uavs, 'infeasible',
-            'no eligible UAV is available',
-        )
+        return _failed('milp', started, tasks, uavs, 'infeasible','no eligible UAV is available',)
 
     capacity = max_tasks_per_uav or task_count
     uav_index = {uav.uav_id: index for index, uav in enumerate(eligible)}
@@ -593,13 +407,9 @@ def run_milp(
     has_ugv = recovery is not None
     speed = allocator.workload_estimator.nominal_speed_mps
     rate = allocator.battery_feasibility.consumption_per_meter
-    inspection_rate = (
-        allocator.battery_feasibility.inspection_consumption_per_minute
-    )
+    inspection_rate = (allocator.battery_feasibility.inspection_consumption_per_minute)
     min_reserve = allocator.battery_feasibility.minimum_reserve_percentage
-    threshold = float(getattr(
-        allocator, 'completion_return_emergency_threshold_percentage', 5.0
-    ))
+    threshold = float(getattr(allocator, 'completion_return_emergency_threshold_percentage', 5.0))
     landing_energy = float(getattr(allocator, 'landing_energy_percentage', 0.0))
 
     start_distance, pair_distance, base_return_distance = {}, {}, {}
@@ -607,21 +417,13 @@ def run_milp(
     for uav in eligible:
         ui = uav_index[uav.uav_id]
         for i, task in enumerate(tasks):
-            start_distance[(ui, i)] = allocator.path_cost.estimate_distance(
-                uav.position, task.target_position, uav.yaw, 0.0
-            )
-            base_return_distance[(ui, i)] = allocator.path_cost.estimate_distance(
-                task.target_position, homes[uav.uav_id]
-            )
+            start_distance[(ui, i)] = allocator.path_cost.estimate_distance(uav.position, task.target_position, uav.yaw, 0.0)
+            base_return_distance[(ui, i)] = allocator.path_cost.estimate_distance(task.target_position, homes[uav.uav_id])
             if has_ugv:
-                ugv_return_distance[(ui, i)] = allocator.path_cost.estimate_distance(
-                    task.target_position, recovery
-                )
+                ugv_return_distance[(ui, i)] = allocator.path_cost.estimate_distance(task.target_position, recovery)
             for j, other in enumerate(tasks):
                 if i != j:
-                    pair_distance[(ui, i, j)] = allocator.path_cost.estimate_distance(
-                        task.target_position, other.target_position
-                    )
+                    pair_distance[(ui, i, j)] = allocator.path_cost.estimate_distance(task.target_position, other.target_position)
     base_valid = {
         uav.uav_id: (
             operating_bounds is None
@@ -644,16 +446,10 @@ def run_milp(
 
     if any(
         value is None or not math.isfinite(value) or value < 0.0
-        for mapping in (
-            start_distance, pair_distance, base_return_distance,
-            ugv_return_distance,
-        )
+        for mapping in (start_distance, pair_distance, base_return_distance,ugv_return_distance,)
         for value in mapping.values()
     ):
-        return _failed(
-            'milp', started, tasks, uavs, 'failed',
-            'route distance matrix contains invalid values',
-        )
+        return _failed('milp', started, tasks, uavs, 'failed','route distance matrix contains invalid values',)
 
     problem = pulp.LpProblem('uav_route_assignment', pulp.LpMinimize)
     assigned = {
@@ -686,53 +482,32 @@ def run_milp(
         for ui in range(k)
     }
     order = {
-        (i, ui): pulp.LpVariable(
-            f'order_{i}_{ui}', lowBound=0, upBound=n, cat=pulp.LpContinuous
-        )
+        (i, ui): pulp.LpVariable(f'order_{i}_{ui}', lowBound=0, upBound=n, cat=pulp.LpContinuous)
         for i in range(n) for ui in range(k)
     }
-    makespan = pulp.LpVariable(
-        'estimated_mission_makespan_sec', lowBound=0,
-        upBound=allocator.maximum_workload_sec,
-    )
+    makespan = pulp.LpVariable('estimated_mission_makespan_sec', lowBound=0, upBound=allocator.maximum_workload_sec,)
 
     max_priority = allocator.cost_function.maximum_priority
     min_priority = allocator.cost_function.minimum_priority
     priority_range = max_priority - min_priority
     priority_scale = allocator.maximum_workload_sec + 1.0
-    coverage_scale = (
-        n * priority_range * priority_scale
-        + allocator.maximum_workload_sec + 3.0
-    )
+    coverage_scale = (n * priority_range * priority_scale + allocator.maximum_workload_sec + 3.0)
     route_distance_expressions = []
     route_time_expressions = []
     route_energy_expressions = []
 
     for i in range(n):
         problem += (
-            pulp.lpSum(assigned[(i, ui)] for ui in range(k))
-            + unassigned[i] == 1,
-            f'assign_or_unassign_{i}',
-        )
+            pulp.lpSum(assigned[(i, ui)] for ui in range(k)) + unassigned[i] == 1,f'assign_or_unassign_{i}',)
         for ui, uav in enumerate(eligible):
-            bounds = (
-                operating_bounds.get(uav.uav_id)
-                if operating_bounds is not None else None
-            )
-            if (
-                bounds is not None
-                and not bounds.contains(tasks[i].target_position)
-            ):
+            bounds = (operating_bounds.get(uav.uav_id) if operating_bounds is not None else None)
+            if (bounds is not None and not bounds.contains(tasks[i].target_position)):
                 problem += assigned[(i, ui)] == 0
     for ui, uav in enumerate(eligible):
         problem += pulp.lpSum(assigned[(i, ui)] for i in range(n)) <= capacity
         problem += pulp.lpSum(starts[(i, ui)] for i in range(n)) == active[ui]
         problem += (
-            pulp.lpSum(
-                ends_base[(i, ui)] + (ends_ugv[(i, ui)] if has_ugv else 0)
-                for i in range(n)
-            ) == active[ui]
-        )
+            pulp.lpSum(ends_base[(i, ui)] + (ends_ugv[(i, ui)] if has_ugv else 0) for i in range(n)) == active[ui]        )
         if not base_valid[uav.uav_id]:
             for i in range(n):
                 problem += ends_base[(i, ui)] == 0
@@ -741,9 +516,7 @@ def run_milp(
                 problem += ends_ugv[(i, ui)] == 0
 
         for i in range(n):
-            incoming = starts[(i, ui)] + pulp.lpSum(
-                arcs[(j, i, ui)] for j in range(n) if j != i
-            )
+            incoming = starts[(i, ui)] + pulp.lpSum(arcs[(j, i, ui)] for j in range(n) if j != i)
             outgoing = (
                 ends_base[(i, ui)]
                 + (ends_ugv[(i, ui)] if has_ugv else 0)
@@ -756,10 +529,7 @@ def run_milp(
             for j in range(n):
                 if i == j:
                     continue
-                problem += (
-                    order[(j, ui)] >= order[(i, ui)] + 1
-                    - n * (1 - arcs[(i, j, ui)])
-                )
+                problem += ( order[(j, ui)] >= order[(i, ui)] + 1- n * (1 - arcs[(i, j, ui)]))
 
         outbound_distance = (
             pulp.lpSum(
@@ -787,10 +557,7 @@ def run_milp(
                if has_ugv else 0.0)
             for i in range(n)
         )
-        selected_route_energy = (
-            selected_route_distance * rate + service_energy
-            + landing_energy * active[ui]
-        )
+        selected_route_energy = (selected_route_distance * rate + service_energy+ landing_energy * active[ui])
         route_time = outbound_distance / speed + service_duration + pulp.lpSum(
             base_return_distance[(ui, i)] / speed * ends_base[(i, ui)]
             + (ugv_return_distance[(ui, i)] / speed * ends_ugv[(i, ui)]
@@ -806,41 +573,22 @@ def run_milp(
         route_time_expressions.append(route_time)
         route_energy_expressions.append(selected_route_energy)
 
-        base_energy_if_used = (
-            base_distance * rate + service_energy + landing_energy * active[ui]
-        )
+        base_energy_if_used = (base_distance * rate + service_energy + landing_energy * active[ui])
         base_remaining = float(uav.battery_percentage) - base_energy_if_used
         base_active = pulp.lpSum(ends_base[(i, ui)] for i in range(n))
-        ugv_active = (
-            pulp.lpSum(ends_ugv[(i, ui)] for i in range(n))
-            if has_ugv else 0
-        )
+        ugv_active = (pulp.lpSum(ends_ugv[(i, ui)] for i in range(n))if has_ugv else 0)
         max_energy = (
             max(start_distance.values(), default=0.0)
             + max(pair_distance.values(), default=0.0) * max(n - 1, 0)
             + max(base_return_distance.values(), default=0.0)
-            + max(ugv_return_distance.values(), default=0.0)
-        ) * rate + sum(
-            max(0.0, float(task.estimated_duration_sec))
-            for task in tasks
-        ) / 60.0 * inspection_rate + landing_energy + 100.0
+            + max(ugv_return_distance.values(), default=0.0)) * rate + sum(max(0.0, float(task.estimated_duration_sec)) for task in tasks) / 60.0 * inspection_rate + landing_energy + 100.0
         big_m = max(1000.0, max_energy)
         if base_valid[uav.uav_id]:
-            problem += (
-                base_remaining >= min_reserve - 1e-6
-                - big_m * (1 - base_active)
-            )
+            problem += (base_remaining >= min_reserve - 1e-6- big_m * (1 - base_active))
         if has_ugv and ugv_valid[uav.uav_id]:
             if base_valid[uav.uav_id]:
-                problem += (
-                    base_remaining <= min_reserve - 1e-6
-                    + big_m * (1 - ugv_active)
-                )
-            problem += selected_route_energy <= max(
-                0.0,
-                float(uav.battery_percentage)
-                - max(min_reserve, threshold),
-            ) + big_m * (1 - ugv_active)
+                problem += (base_remaining <= min_reserve - 1e-6+ big_m * (1 - ugv_active))
+            problem += selected_route_energy <= max(0.0,float(uav.battery_percentage)- max(min_reserve, threshold),) + big_m * (1 - ugv_active)
 
     # Apply the project's cross-UAV minimum-separation constraint.
     for i, first in enumerate(tasks):
@@ -854,40 +602,16 @@ def run_milp(
                         continue
                     problem += assigned[(i, ua)] + assigned[(j, ub)] <= 1
 
-    # Coverage and priority dominate; makespan is the next objective, with
-    # distance and energy used only to break otherwise similar plans.
-    distance_bound = _objective_distance_bound(
-        allocator, tasks, uavs, homes
-    )
-    energy_bound = (
-        distance_bound * rate
-        + sum(float(task.estimated_duration_sec) for task in tasks)
-        / 60.0 * inspection_rate
-        + len(uavs) * landing_energy + 1.0
-    )
+    distance_bound = _objective_distance_bound(allocator, tasks, uavs, homes)
+    energy_bound = (distance_bound * rate + sum(float(task.estimated_duration_sec) for task in tasks) / 60.0 * inspection_rate + len(uavs) * landing_energy + 1.0)
     total_priority_penalty = pulp.lpSum(
-        (
-            max_priority
-            - min(max_priority, max(min_priority, int(task.priority)))
-        )
-        * assigned[(i, ui)]
-        for i, task in enumerate(tasks) for ui in range(k)
-    )
-    problem += (
-        coverage_scale * pulp.lpSum(unassigned.values())
-        + priority_scale * total_priority_penalty
-        + makespan
-        + 0.001 * pulp.lpSum(route_distance_expressions)
-        / (distance_bound + 1.0)
-        + 0.001 * pulp.lpSum(route_energy_expressions)
-        / (energy_bound + 1.0)
-    )
+        (max_priority - min(max_priority, max(min_priority, int(task.priority)))
+        ) * assigned[(i, ui)] for i, task in enumerate(tasks) for ui in range(k))
+    problem += (coverage_scale * pulp.lpSum(unassigned.values()) + priority_scale * total_priority_penalty + makespan
+        + 0.001 * pulp.lpSum(route_distance_expressions) / (distance_bound + 1.0) + 0.001 * pulp.lpSum(route_energy_expressions) / (energy_bound + 1.0))
 
     solver = None
-    solver_names = (
-        'COIN_CMD', 'PULP_CBC_CMD', 'HiGHS_CMD', 'HiGHS',
-        'GLPK_CMD', 'CPLEX_CMD', 'GUROBI_CMD', 'GUROBI',
-    )
+    solver_names = ('COIN_CMD', 'PULP_CBC_CMD', 'HiGHS_CMD', 'HiGHS','GLPK_CMD', 'CPLEX_CMD', 'GUROBI_CMD', 'GUROBI',)
     try:
         available = set(pulp.listSolvers(onlyAvailable=True))
         for solver_name in solver_names:
@@ -904,10 +628,7 @@ def run_milp(
                 break
             solver = None
         if solver is None:
-            return _failed(
-                'milp', started, tasks, uavs, 'solver_unavailable',
-                'PuLP is installed, but no supported solver backend is available',
-            )
+            return _failed('milp', started, tasks, uavs, 'solver_unavailable', 'PuLP is installed, but no supported solver backend is available',)
         problem.solve(solver)
     except Exception as error:
         return _failed('milp', started, tasks, uavs, 'solver_error', str(error))
@@ -920,14 +641,9 @@ def run_milp(
         or abs(variable.value() - round(variable.value())) <= 1e-5
         for variable in all_variables
     )
-    feasible_incumbent = (
-        integral and (not hasattr(problem, 'valid') or problem.valid(1e-5))
-    )
+    feasible_incumbent = (integral and (not hasattr(problem, 'valid') or problem.valid(1e-5)))
     if not feasible_incumbent:
-        return _failed(
-            'milp', started, tasks, uavs, solver_status.lower(),
-            'solver returned no feasible incumbent',
-        )
+        return _failed('milp', started, tasks, uavs, solver_status.lower(),'solver returned no feasible incumbent',)
 
     route_order = []
     reasons = {}
@@ -944,18 +660,11 @@ def run_milp(
         ui = uav_index[chosen.uav_id]
         order_value = order[(i, ui)].value()
         if order_value is None:
-            reasons[task.task_id] = (
-                'MILP returned no route order for an assigned task'
-            )
+            reasons[task.task_id] = ('MILP returned no route order for an assigned task')
             continue
-        route_order.append((
-            float(order_value), task.task_id, chosen.uav_id,
-            task.priority,
-        ))
+        route_order.append((float(order_value), task.task_id, chosen.uav_id,task.priority,))
     route_order.sort(key=lambda item: (item[2], item[0], item[1]))
-    assignments = [{
-        'task_id': task_id, 'uav_id': uav_id, 'priority': priority,
-        'bid': 0.0,
+    assignments = [{'task_id': task_id, 'uav_id': uav_id, 'priority': priority,'bid': 0.0,
     } for _order, task_id, uav_id, priority in route_order]
 
     solver_info = {
@@ -980,16 +689,10 @@ def _failed(name, started, tasks, uavs, status, detail):
         allocation_time_sec=time.perf_counter() - started,
         assignments=[],
         reasons={task.task_id: detail for task in tasks},
-        solver={
-            'name': 'PuLP MILP solver',
-            'detail': detail,
-            'incumbent_available': False,
-        },
+        solver={'name': 'PuLP MILP solver','detail': detail,'incumbent_available': False,},
         distance_by_uav_m={u.uav_id: 0.0 for u in uavs},
         energy_by_uav_percent={u.uav_id: 0.0 for u in uavs},
-        remaining_battery_by_uav_percent={
-            u.uav_id: u.battery_percentage for u in uavs
-        },
+        remaining_battery_by_uav_percent={u.uav_id: u.battery_percentage for u in uavs},
         workload_by_uav_sec={u.uav_id: 0.0 for u in uavs},
         violations=[],
     )

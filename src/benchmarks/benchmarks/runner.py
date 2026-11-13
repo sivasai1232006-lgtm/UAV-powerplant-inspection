@@ -1,5 +1,3 @@
-"""Command line entry point for isolated, non-actuating allocator benchmarks."""
-
 import argparse
 import csv
 from datetime import datetime
@@ -8,30 +6,16 @@ import math
 import os
 from pathlib import Path
 import sys
-
 import yaml
-
-from uav_allocator.auction_allocator import (
-    InspectionTask,
-    UavSnapshot,
-    allocator_from_config,
-)
+from uav_allocator.auction_allocator import (InspectionTask,UavSnapshot,allocator_from_config,)
 from uav_interfaces.msg import UAVState
 from uav_mission.operating_bounds import OperatingBounds
 from uav_mission.task_manager import tasks_from_mission
-
-from benchmarks.algorithms import (
-    Evaluation,
-    run_existing,
-    run_greedy,
-    run_milp,
-)
-
+from benchmarks.algorithms import (Evaluation,run_existing,run_greedy,run_milp,)
 
 def _package_share(package):
     from ament_index_python.packages import get_package_share_directory
     return Path(get_package_share_directory(package))
-
 
 def _default_config(package, file_name):
     try:
@@ -39,7 +23,6 @@ def _default_config(package, file_name):
     except Exception:
         root = Path(__file__).resolve().parents[2]
         return root / package / 'config' / file_name
-
 
 def _source_workspace_root():
     """Find the source tree even when this entry point is installed."""
@@ -59,14 +42,12 @@ def _source_workspace_root():
         return current
     return module_root
 
-
 def _read_yaml(path):
     with Path(path).open(encoding='utf-8') as stream:
         data = yaml.safe_load(stream)
     if not isinstance(data, dict):
         raise ValueError(f'Expected YAML mapping in {path}')
     return data
-
 
 def _normalise_allocator(data):
     if 'allocator' in data:
@@ -75,7 +56,6 @@ def _normalise_allocator(data):
         if isinstance(value, dict) and 'ros__parameters' in value:
             return value['ros__parameters']
     return data
-
 
 def _make_inputs(mission_data, infeasible_tasks=None):
     mission = mission_data['mission']
@@ -112,7 +92,7 @@ def _make_inputs(mission_data, infeasible_tasks=None):
         )
         if len(start) != 3 or len(configured_home) != 3:
             raise ValueError(f'{uav_id} positions must have three coordinates')
-        # Completion-return policy uses the UAV's original takeoff point.
+        
         homes[uav_id] = (start[0], start[1], landing_altitude)
         uavs.append(UavSnapshot(
             uav_id=uav_id,
@@ -125,7 +105,6 @@ def _make_inputs(mission_data, infeasible_tasks=None):
         ))
     return tasks, uavs, homes
 
-
 def _make_operating_bounds(mission):
     region = mission.get('navigation', {}).get('operating_region')
     if region is None:
@@ -136,7 +115,6 @@ def _make_operating_bounds(mission):
         )
         for config in mission['uavs']
     }
-
 
 def _assignment_rows(evaluation, tasks):
     by_id = {row['task_id']: row for row in evaluation.assignments}
@@ -153,7 +131,6 @@ def _assignment_rows(evaluation, tasks):
                 'status': 'unassigned',
                 'reason': evaluation.reasons.get(task.task_id, ''),
             }
-
 
 def _aggregate_metrics(evaluation, task_count, run_info):
     assigned_count = len(evaluation.assignments)
@@ -239,9 +216,7 @@ def _aggregate_metrics(evaluation, task_count, run_info):
             return_destination_by_uav[uav_id] = initial.get(
                 'normal_landing_target'
             )
-    # Total mission time is the sum of all UAV mission durations. Each
-    # per-UAV duration includes takeoff-to-task travel, inspection time, and
-    # the return leg to its selected landing destination.
+
     estimated_completion_sec = sum(estimated_completion_by_uav.values())
     violations = evaluation.violations
     status = evaluation.status
@@ -326,7 +301,6 @@ def _aggregate_metrics(evaluation, task_count, run_info):
         'solver': evaluation.solver,
     }
 
-
 def _write_evaluation(
     directory, evaluation, tasks, run_info, debug_task_details=False
 ):
@@ -392,7 +366,6 @@ def _write_evaluation(
     (directory / 'summary.txt').write_text('\n'.join(summary) + '\n', encoding='utf-8')
     return metrics
 
-
 def _comparison_records(metrics_rows, run_info):
     uav_ids = list(run_info['uav_initial_conditions'])
     records = []
@@ -453,7 +426,6 @@ def _comparison_records(metrics_rows, run_info):
             'Constraint Violations': violations,
         })
     return records
-
 
 def _write_algorithm_comparison(run_dir, metric_rows, run_info):
     records = _comparison_records(metric_rows, run_info)
@@ -565,7 +537,6 @@ def _write_algorithm_comparison(run_dir, metric_rows, run_info):
         '\n'.join(lines) + '\n', encoding='utf-8'
     )
 
-
 def _write_results(
     root, tasks, results, run_info, debug_task_details=False
 ):
@@ -644,7 +615,6 @@ def _write_results(
     )
     return run_dir
 
-
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description='Compare three allocation algorithms offline without commanding UAVs.'
@@ -677,9 +647,7 @@ def main(argv=None):
     config['future_lookahead_tasks'] = 0
     cost_config = dict(config.get('cost', {}))
     cost_weights = dict(cost_config.get('weights', {}))
-    # Hard battery/workload limits are enforced identically by all methods.
-    # Remove the auction's per-bid warning penalties so the MILP's internal
-    # optimization objective can represent the same route trade-offs.
+ 
     for name in ('battery', 'workload', 'future'):
         if name in cost_weights:
             cost_weights[name] = 0.0
@@ -755,8 +723,7 @@ def main(argv=None):
             for u in uavs
         },
     }
-    # Independent copies guarantee that hypothetical state updates from one
-    # evaluator never leak into another evaluator or the live mission.
+
     outcomes = []
     for function in (
         lambda: run_existing(
@@ -796,10 +763,8 @@ def main(argv=None):
         debug_task_details=args.write_debug_task_details,
     )
     print(f'Benchmark results saved to {result_path}')
-    # Algorithm-level failures are captured in metrics.json; successful result
-    # persistence means the benchmark process itself completed normally.
-    return 0
 
+    return 0
 
 if __name__ == '__main__':
     raise SystemExit(main())

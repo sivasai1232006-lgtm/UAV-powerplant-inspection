@@ -3,20 +3,17 @@ import struct
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-
 def _values(element, default=(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)):
     if element is None or not (element.text or '').strip():
         return default
     values = tuple(float(value) for value in element.text.split())
     return values + (0.0,) * (6 - len(values))
 
-
 def _required_float(element, path, context):
     text = element.findtext(path)
     if text is None or not text.strip():
         raise ValueError(f'Missing {path} value in {context}')
     return float(text)
-
 
 def _rotate(point, pose):
     x, y, z = point
@@ -33,7 +30,6 @@ def _rotate(point, pose):
         + (sy * sp * cr - cy * sr) * z,
         (-sp) * x + cp * sr * y + cp * cr * z,
     )
-
 
 def _transform(point, pose):
     rotated = _rotate(point, pose)
@@ -69,7 +65,6 @@ def _compose(parent, child):
         yaw = math.atan2(-rotation[0][1], rotation[1][1])
     return translated + (roll, pitch, yaw)
 
-
 def _mesh_vertices(path):
     content = path.read_bytes()
     if len(content) >= 84:
@@ -94,9 +89,7 @@ def _mesh_vertices(path):
         raise ValueError(f'Unable to read STL mesh vertices: {path}')
     return vertices
 
-
 def _mesh_bounds(path):
-    """Read mesh extents without retaining every triangle vertex."""
     content = path.read_bytes()
     bounds = [[math.inf, -math.inf] for _ in range(3)]
 
@@ -126,9 +119,7 @@ def _mesh_bounds(path):
         for z in bounds[2]
     ]
 
-
 def _mesh_triangles(path):
-    """Load collision-mesh triangles from binary or ASCII STL."""
     content = path.read_bytes()
     if len(content) >= 84:
         count = struct.unpack_from('<I', content, 80)[0]
@@ -150,7 +141,6 @@ def _mesh_triangles(path):
     if not triangles:
         raise ValueError(f'Unable to read STL mesh triangles: {path}')
     return triangles
-
 
 def _geometry_points(geometry, model_dir):
     if geometry is None:
@@ -197,9 +187,7 @@ def _geometry_points(geometry, model_dir):
     raise ValueError('Unsupported collision geometry in SDF')
 
 
-
 def _box_triangles(size):
-    """Return a closed, triangulated box centered at the local origin."""
     hx, hy, hz = (float(value) / 2.0 for value in size)
     vertices = [(x, y, z) for x in (-hx, hx) for y in (-hy, hy) for z in (-hz, hz)]
     faces = [(0, 1, 3, 2), (4, 6, 7, 5), (0, 4, 5, 1),
@@ -209,9 +197,7 @@ def _box_triangles(size):
             for a, b, c in ((face[0], face[1], face[2]),
                             (face[0], face[2], face[3]))]
 
-
 def _cylinder_triangles(radius, length, segments=48):
-    """Closed triangulated cylinder; SDF cylinders have their axis on local Z."""
     radius, half = float(radius), float(length) / 2.0
     if radius <= 0.0 or half <= 0.0:
         raise ValueError('Cylinder radius and length must be positive')
@@ -231,9 +217,7 @@ def _cylinder_triangles(radius, length, segments=48):
                           (center_top, top[index], top[nxt])))
     return triangles
 
-
 def _sphere_triangles(radius, rings=16, segments=32):
-    """Closed UV sphere mesh used to preserve its circular XY footprint."""
     radius = float(radius)
     if radius <= 0.0:
         raise ValueError('Sphere radius must be positive')
@@ -258,9 +242,7 @@ def _sphere_triangles(radius, rings=16, segments=32):
             triangles.extend(((a, b, c), (a, c, d)))
     return triangles
 
-
 def _geometry_triangles(geometry, model_dir):
-    """Return local-coordinate triangles for every supported SDF collision."""
     if geometry is None:
         raise ValueError('Collision is missing its geometry element')
     box = geometry.find('box')
@@ -292,10 +274,8 @@ def _geometry_triangles(geometry, model_dir):
                       for vertex in triangle) for triangle in _mesh_triangles(mesh_path)]
     raise ValueError('Unsupported collision geometry in SDF')
 
-
 def _triangle_vertices(triangles):
     return [point for triangle in triangles for point in triangle]
-
 
 def load_world_collisions(world_path, models_dir):
     world_path = Path(world_path)
