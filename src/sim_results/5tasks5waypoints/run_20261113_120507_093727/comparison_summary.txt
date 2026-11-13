@@ -1,0 +1,25 @@
+Scenario: 5 Tasks, 5 Waypoints
+All mission, distance, and battery figures are estimates; no flight data is used.
+
+Metric                                         Existing         MILP       Greedy
+Allocation Time (s)                            0.000411     0.341225     0.000257
+Estimated Mission Time (s)                       304.29       281.27       288.78
+Estimated Total Distance (m)                     367.73       326.29       339.81
+Estimated UAV 1 Distance (m)                     118.50       134.32       147.84
+Estimated UAV 2 Distance (m)                     249.23       191.97       191.97
+Estimated UAV 1 Battery Used (pp)                  8.04         8.87         9.55
+Estimated UAV 2 Battery Used (pp)                 14.56        11.65        11.65
+Estimated UAV 1 Remaining Battery (%)             91.96        91.13        90.45
+Estimated UAV 2 Remaining Battery (%)             85.44        88.35        88.35
+Estimated Total Battery Used (pp)                 22.59        20.52        21.20
+Tasks Assigned                                        5            5            5
+Task Assignment Coverage (%)                     100.00       100.00       100.00
+Unassigned Tasks                                      0            0            0
+Feasible                                           True         True         True
+Constraint Violations                                 0            0            0
+
+BEST ESTIMATES
+Fastest allocation computation: Greedy
+Lowest estimated mission time: MILP
+Lowest estimated total distance: MILP
+Lowest estimated battery use: MILP

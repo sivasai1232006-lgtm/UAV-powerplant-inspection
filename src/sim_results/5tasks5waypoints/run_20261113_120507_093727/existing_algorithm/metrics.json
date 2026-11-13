@@ -1,6 +1,6 @@
 {
   "algorithm_name": "existing_algorithm",
-  "allocation_computation_time_sec": 0.0004077809999216697,
+  "allocation_computation_time_sec": 0.000410746999989442,
   "assigned_task_count": 5,
   "assigned_tasks_by_uav": {
     "uav_1": [
@@ -58,19 +58,19 @@
   "constraint_violations": [],
   "estimated_distance_by_uav_m": {
     "uav_1": 118.49613738420348,
-    "uav_2": 249.6460155286661
+    "uav_2": 249.23193325641768
   },
   "estimated_energy_by_uav_percent": {
     "uav_1": 8.037306869210173,
-    "uav_2": 14.578134109766639
+    "uav_2": 14.557429996154218
   },
-  "estimated_energy_consumption_percent": 22.615440978976814,
+  "estimated_energy_consumption_percent": 22.59473686536439,
   "estimated_mission_time_by_uav_sec": {
     "uav_1": 119.8311874356686,
-    "uav_2": 184.69223084925895
+    "uav_2": 184.46218514245425
   },
-  "estimated_total_distance_m": 368.1421529128696,
-  "estimated_total_mission_time_sec": 304.5234182849275,
+  "estimated_total_distance_m": 367.7280706406211,
+  "estimated_total_mission_time_sec": 304.29337257812284,
   "feasibility_status": "FEASIBLE",
   "feasible": true,
   "infeasible_task_count": 0,
@@ -83,7 +83,7 @@
   "number_of_waypoints": 5,
   "remaining_battery_by_uav_percent": {
     "uav_1": 91.96269313078983,
-    "uav_2": 85.42186589023336
+    "uav_2": 85.44257000384579
   },
   "return_destination_by_uav": {
     "uav_1": [
@@ -130,17 +130,17 @@
       "uav_id": "uav_1"
     },
     "POWER_GENERATOR": {
-      "estimated_distance_m": 73.00766826071916,
-      "estimated_energy_percent": 3.6837167463692913,
-      "estimated_workload_sec": 28.279907850199766,
+      "estimated_distance_m": 72.85197921662338,
+      "estimated_energy_percent": 3.675932294164502,
+      "estimated_workload_sec": 28.236660893506492,
       "priority": 1,
       "status": "assigned_not_executed",
       "uav_id": "uav_2"
     },
     "TRANFORMER": {
-      "estimated_distance_m": 37.990872941003694,
-      "estimated_energy_percent": 1.9412103137168515,
-      "estimated_workload_sec": 20.553020261389914,
+      "estimated_distance_m": 37.732479712851024,
+      "estimated_energy_percent": 1.928290652309218,
+      "estimated_workload_sec": 20.48124436468084,
       "priority": 1,
       "status": "assigned_not_executed",
       "uav_id": "uav_2"

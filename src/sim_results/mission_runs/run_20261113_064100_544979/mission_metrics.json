@@ -1,0 +1,124 @@
+{
+  "inspection_completion_time_sec": 187.5,
+  "inspection_time_sec": 50.0,
+  "mission_failed_reasons": {},
+  "mission_status": "COMPLETED",
+  "mission_time_sec": 326.0,
+  "navigation_failures": 0,
+  "planned_distance_m": 518.4970384498033,
+  "planning_time_sec": 0.12481821200003651,
+  "replan_count": 21,
+  "return_distance_m": 118.95098555208327,
+  "run_status": "COMPLETED",
+  "saved_at_utc": "2026-11-13T06:41:00.544945+00:00",
+  "schema_version": 1,
+  "started_at_utc": "2026-11-13T06:35:34.543059+00:00",
+  "task_counts": {
+    "cancelled": 0,
+    "completed": 5,
+    "failed": 0,
+    "total": 5,
+    "unfinished": 0
+  },
+  "tasks": [
+    {
+      "assigned_uav": "uav_1",
+      "estimated_duration_sec": 10.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "COMPLETED",
+      "task_id": "TRANFORMER",
+      "x_m": 4.0,
+      "y_m": 20.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "uav_1",
+      "estimated_duration_sec": 15.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "COMPLETED",
+      "task_id": "POWER_CELLS",
+      "x_m": -15.0,
+      "y_m": 20.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "uav_1",
+      "estimated_duration_sec": 12.0,
+      "failure_reason": "",
+      "priority": 2,
+      "status": "COMPLETED",
+      "task_id": "BUILDING_NORTH_VIEW",
+      "x_m": -12.0,
+      "y_m": 35.0,
+      "z_m": 7.0
+    },
+    {
+      "assigned_uav": "uav_2",
+      "estimated_duration_sec": 8.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "COMPLETED",
+      "task_id": "POWER_GENERATOR",
+      "x_m": 6.0,
+      "y_m": -30.0,
+      "z_m": 3.0
+    },
+    {
+      "assigned_uav": "uav_2",
+      "estimated_duration_sec": 5.0,
+      "failure_reason": "",
+      "priority": 2,
+      "status": "COMPLETED",
+      "task_id": "MIDDLE_LINE",
+      "x_m": -3.0,
+      "y_m": -60.0,
+      "z_m": 5.0
+    }
+  ],
+  "total_distance_m": 302.254766785001,
+  "travel_time_sec": 516.8007695179999,
+  "uavs": {
+    "uav_1": {
+      "distance_m": 125.27395929847879,
+      "energy_consumed_wh": 0.0,
+      "final_battery_percent": 99.99465942382812,
+      "final_estimated_battery_percent": 99.99465942382812,
+      "final_position_m": [
+        -5.028276449987437,
+        0.05917185753124714,
+        0.1820165847726734
+      ],
+      "initial_battery_percent": 99.99465942382812,
+      "initial_estimated_battery_percent": 99.99465942382812,
+      "return_failure_reason": "",
+      "return_status": "LANDED",
+      "takeoff_position_m": [
+        -5.000029907370088,
+        -0.04043984494598392,
+        0.2464109462173159
+      ]
+    },
+    "uav_2": {
+      "distance_m": 176.9808074865222,
+      "energy_consumed_wh": 0.0,
+      "final_battery_percent": 52.90021896362305,
+      "final_estimated_battery_percent": 52.90021896362305,
+      "final_position_m": [
+        4.992796821154138,
+        -0.06401020359201623,
+        0.25896208088298833
+      ],
+      "initial_battery_percent": 99.99465942382812,
+      "initial_estimated_battery_percent": 99.99465942382812,
+      "return_failure_reason": "",
+      "return_status": "LANDED",
+      "takeoff_position_m": [
+        5.008025080724194,
+        0.05604643494535699,
+        0.26183841003143027
+      ]
+    }
+  }
+}
