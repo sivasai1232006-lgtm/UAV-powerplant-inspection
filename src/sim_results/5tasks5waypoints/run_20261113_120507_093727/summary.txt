@@ -4,6 +4,6 @@ All algorithms use the same task set, route evaluator, battery model, workload/c
 
 algorithm | feasibility | assigned | unassigned | allocation sec | estimated mission sec | estimated distance m | estimated energy %
 ----------------------------------------------------------------------------------------------------------------------
-existing_algorithm | FEASIBLE | 5 | 0 | 0.000408 | 304.52 | 368.14 | 22.62
-milp | FEASIBLE | 5 | 0 | 0.355329 | 279.71 | 323.48 | 20.38
-greedy | FEASIBLE | 5 | 0 | 0.000263 | 286.80 | 336.24 | 21.02
+existing_algorithm | FEASIBLE | 5 | 0 | 0.000411 | 304.29 | 367.73 | 22.59
+milp | FEASIBLE | 5 | 0 | 0.341225 | 281.27 | 326.29 | 20.52
+greedy | FEASIBLE | 5 | 0 | 0.000257 | 288.78 | 339.81 | 21.20
