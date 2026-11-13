@@ -22,7 +22,6 @@
   ros__parameters:
       use_sim_time: true
       global_frame: map
-      # The static costmap plans from explicit map-frame action start poses.
       robot_base_frame: uav_1/base_link
       update_frequency: 2.0
       publish_frequency: 1.0

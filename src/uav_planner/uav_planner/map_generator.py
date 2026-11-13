@@ -1,8 +1,6 @@
 import math
 
-
 def _mesh_bins(triangles, x_min, x_max, y_min, y_max, bin_size=1.0):
-    """Index mesh facets spatially so each map cell checks nearby facets."""
     bins = {}
     for triangle in triangles:
         xs = [point[0] for point in triangle]
@@ -20,14 +18,10 @@ def _mesh_bins(triangles, x_min, x_max, y_min, y_max, bin_size=1.0):
                 bins.setdefault((bx, by), []).append(triangle)
     return bins
 
-
 def _triangle_height(triangle, x, y):
-    """Return the mesh height where a vertical ray intersects a facet."""
     (x1, y1, z1), (x2, y2, z2), (x3, y3, z3) = triangle
     denominator = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3)
     if abs(denominator) < 1e-10:
-        # A vertical face projects to a line. A cell-center ray almost never
-        # lies exactly on it; its top/bottom cap supplies the volume crossing.
         return None
     a = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) / denominator
     b = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / denominator
@@ -35,7 +29,6 @@ def _triangle_height(triangle, x, y):
     if min(a, b, c) < -1e-7:
         return None
     return a * z1 + b * z2 + c * z3
-
 
 def _mesh_column_intersects(bins, x, y, lower_z, upper_z):
     hits = []
@@ -52,14 +45,10 @@ def _mesh_column_intersects(bins, x, y, lower_z, upper_z):
         if not unique or abs(height - unique[-1]) > 1e-4:
             unique.append(height)
 
-    # A watertight collision mesh yields paired entry/exit crossings along
-    # each vertical ray. This tests volume, not the mesh's large XY bounding
-    # rectangle, so openings and passages remain available to the planner.
     for index in range(0, len(unique) - 1, 2):
         if unique[index] <= upper_z and unique[index + 1] >= lower_z:
             return True
     return False
-
 
 def _clip_triangle(triangle, lower_z, upper_z):
     polygon = list(triangle)
@@ -92,7 +81,6 @@ def _clip_triangle(triangle, lower_z, upper_z):
         polygon = clipped
     return polygon
 
-
 def _projected_mesh_bins(triangles, lower_z, upper_z, bin_size=1.0,
                          raster_margin=0.0):
     bins = {}
@@ -100,9 +88,7 @@ def _projected_mesh_bins(triangles, lower_z, upper_z, bin_size=1.0,
         polygon = _clip_triangle(triangle, lower_z, upper_z)
         if not polygon:
             continue
-        # Include neighbouring bins touched by the half-cell raster margin.
-        # Without this expansion, a cell just outside a triangle's exact AABB
-        # could never test the polygon even though its centre is within margin.
+ 
         x0 = min(p[0] for p in polygon) - raster_margin
         x1 = max(p[0] for p in polygon) + raster_margin
         y0 = min(p[1] for p in polygon) - raster_margin
@@ -113,7 +99,6 @@ def _projected_mesh_bins(triangles, lower_z, upper_z, bin_size=1.0,
                             math.floor(y1 / bin_size) + 1):
                 bins.setdefault((bx, by), []).append(polygon)
     return bins
-
 
 def _point_segment_distance(x, y, first, second):
     dx, dy = second[0] - first[0], second[1] - first[1]
@@ -127,7 +112,6 @@ def _point_segment_distance(x, y, first, second):
         x - first[0] - fraction * dx,
         y - first[1] - fraction * dy,
     )
-
 
 def _inside_projected_polygon(x, y, polygon, raster_margin):
     inside = False
@@ -143,7 +127,6 @@ def _inside_projected_polygon(x, y, polygon, raster_margin):
             if x < crossing_x:
                 inside = not inside
     return inside
-
 
 def generate_grid(obstacles, config, base_grid=None):
     resolution = float(config['resolution'])
@@ -183,9 +166,7 @@ def generate_grid(obstacles, config, base_grid=None):
 
         triangles = obstacle.get('triangles')
         if not triangles:
-            # Primitive collision geometry and legacy geometry records use
-            # their actual extents. Nav2 applies the horizontal UAV footprint
-            # once, in the costmap, rather than duplicating inflation here.
+
             for row in range(first_y, last_y + 1):
                 start = row * width + first_x
                 grid[start:start + last_x - first_x + 1] = [
@@ -233,10 +214,7 @@ def generate_grid(obstacles, config, base_grid=None):
         'data': grid,
     }
 
-
-def _merge_base_occupancy(target, width, height, resolution, origin,
-                          base_grid, occupied, free_value, unknown_value):
-    """Preserve base-map occupancy and unknown cells, then overlay structure."""
+def _merge_base_occupancy(target, width, height, resolution, origin,base_grid, occupied, free_value, unknown_value):
     if (base_grid['width'] != width or base_grid['height'] != height
             or abs(float(base_grid['resolution']) - resolution) > 1e-9
             or tuple(base_grid['origin'][:2]) != tuple(origin)):
@@ -248,9 +226,7 @@ def _merge_base_occupancy(target, width, height, resolution, origin,
         elif value >= 50:
             target[index] = occupied
 
-
 def fuse_occupancy_grids(base_grid, structural_grid):
-    """Overlay structural lethal cells on a SLAM/base occupancy grid."""
     if base_grid is None:
         return dict(structural_grid)
     resolution = float(base_grid['resolution'])
@@ -259,12 +235,8 @@ def fuse_occupancy_grids(base_grid, structural_grid):
     structure_origin = structural_grid['origin']
     base_max_x = base_origin[0] + base_grid['width'] * resolution
     base_max_y = base_origin[1] + base_grid['height'] * resolution
-    structure_max_x = (
-        structure_origin[0] + structural_grid['width'] * structure_resolution
-    )
-    structure_max_y = (
-        structure_origin[1] + structural_grid['height'] * structure_resolution
-    )
+    structure_max_x = (structure_origin[0] + structural_grid['width'] * structure_resolution)
+    structure_max_y = (structure_origin[1] + structural_grid['height'] * structure_resolution)
     origin_x = min(base_origin[0], structure_origin[0])
     origin_y = min(base_origin[1], structure_origin[1])
     width = math.ceil((max(base_max_x, structure_max_x) - origin_x) / resolution)
@@ -298,19 +270,12 @@ def fuse_occupancy_grids(base_grid, structural_grid):
                         if value >= 50:
                             data[index] = 100
                         elif not lethal_only and data[index] != 100:
-                            # Preserve unknown cells from SLAM. A known free
-                            # source cell fills only output cells still unknown.
                             if value >= 0 or data[index] == unknown:
                                 data[index] = value
 
     overlay(base_grid)
     overlay(structural_grid, lethal_only=True)
     result = dict(base_grid)
-    result.update({
-        'width': width,
-        'height': height,
-        'resolution': resolution,
-        'origin': [origin_x, origin_y, base_origin[2]],
-    })
+    result.update({'width': width,'height': height,'resolution': resolution,'origin': [origin_x, origin_y, base_origin[2]],})
     result['data'] = data
     return result

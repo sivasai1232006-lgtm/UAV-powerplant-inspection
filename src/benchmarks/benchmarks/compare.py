@@ -16,8 +16,6 @@ def collect(results_dir):
         except (OSError, json.JSONDecodeError):
             continue
         if comparison.get('comparison_model_version') != 'coverage_bounds_v4':
-            # Older files used a different metric schema. Do not mix those estimates
-            # into current cross-run summaries.
             continue
         for algorithm, metrics in comparison.get('algorithms', {}).items():
             rows.append({
@@ -26,27 +24,12 @@ def collect(results_dir):
                 'waypoint_count': comparison.get('waypoint_count'),
                 'algorithm': algorithm,
                 'status': metrics.get('status'),
-                'assigned_tasks': metrics.get(
-                    'assigned_task_count', metrics.get('assigned_tasks')
-                ),
-                'unassigned_tasks': metrics.get(
-                    'unassigned_task_count', metrics.get('unassigned_tasks')
-                ),
-                'allocation_time_sec': metrics.get(
-                    'allocation_computation_time_sec',
-                    metrics.get('allocation_time_sec'),
-                ),
-                'estimated_distance_m': metrics.get(
-                    'estimated_total_distance_m',
-                    metrics.get('estimated_distance_m'),
-                ),
-                'estimated_mission_time_sec': metrics.get(
-                    'estimated_total_mission_time_sec'
-                ),
-                'estimated_energy_percent': metrics.get(
-                    'estimated_energy_consumption_percent',
-                    metrics.get('estimated_energy_percent'),
-                ),
+                'assigned_tasks': metrics.get('assigned_task_count', metrics.get('assigned_tasks')),
+                'unassigned_tasks': metrics.get('unassigned_task_count', metrics.get('unassigned_tasks')),
+                'allocation_time_sec': metrics.get('allocation_computation_time_sec',metrics.get('allocation_time_sec'),),
+                'estimated_distance_m': metrics.get('estimated_total_distance_m',metrics.get('estimated_distance_m'),),
+                'estimated_mission_time_sec': metrics.get('estimated_total_mission_time_sec'),
+                'estimated_energy_percent': metrics.get('estimated_energy_consumption_percent',metrics.get('estimated_energy_percent'),),
                 'feasibility_status': metrics.get('feasibility_status'),
                 'battery_violation_count': metrics.get('battery_violation_count'),
                 'safety_violation_count': metrics.get('safety_violation_count'),
@@ -59,11 +42,7 @@ def main(argv=None):
     parser.add_argument('--results-dir', default='')
     parser.add_argument('--output-csv', default='')
     args = parser.parse_args(argv)
-    root = (
-        Path(args.results_dir)
-        if args.results_dir
-        else _source_workspace_root() / 'sim_results'
-    )
+    root = (Path(args.results_dir)if args.results_dir else _source_workspace_root() / 'sim_results')
     rows = collect(root)
     if not rows:
         print(f'No benchmark comparison files found under {root}')
