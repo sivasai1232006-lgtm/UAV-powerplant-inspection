@@ -109,13 +109,13 @@ mission:
       priority: 2
       estimated_duration_s: 5.0
 
-     - id: MIDDLE_LINE
+    - id: MIDDLE_LINE_2
       type: inspection
       waypoint: [-3.0, -25.0, 5.0]
       priority: 2
       estimated_duration_s: 5.0
-    
-     - id: MIDDLE_LINE
+
+    - id: MIDDLE_LINE_3
       type: inspection
       waypoint: [-3.0, -50.0, 5.0]
       priority: 2
