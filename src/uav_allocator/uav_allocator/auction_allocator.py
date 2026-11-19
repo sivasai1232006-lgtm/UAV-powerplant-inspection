@@ -111,7 +111,7 @@ class AuctionAllocator:
         self.cruise_altitude_m = float(cruise_altitude_m)
 
     def allocate(self,tasks,uavs,base_positions,already_assigned_task_ids=(),allowed_uav_ids_by_task=None,):
-        tasks = sorted(tasks,key=lambda task: (int(task.priority), str(task.task_id)),)[:self.planning_batch_size]
+        tasks = sorted(tasks,key=lambda task: (int(task.priority), str(task.task_id)))[:self.planning_batch_size]
         uavs = list(uavs)
         assigned_task_ids = set(already_assigned_task_ids)
         decisions = []
@@ -121,9 +121,7 @@ class AuctionAllocator:
                 float(position[1]),
                 self.landing_altitude_m,
             )
-            if self._valid_position(position) else position
-            for uav_id, position in base_positions.items()
-        }
+            if self._valid_position(position) else position for uav_id, position in base_positions.items()}
         self._allocation_homes = landing_homes
         routes = {uav.uav_id: self._existing_workload(uav) for uav in uavs}
         snapshots = {uav.uav_id: uav for uav in uavs}
@@ -155,22 +153,16 @@ class AuctionAllocator:
                 for uav in uavs:
                     if uav.uav_id in committed_uav_ids:
                         continue
-                    if (
-                        allowed_uav_ids_by_task is not None
-                        and uav.uav_id not in allowed_uav_ids_by_task.get(
-                            task.task_id, ()
-                        )
+                    if (allowed_uav_ids_by_task is not None
+                        and uav.uav_id not in allowed_uav_ids_by_task.get(task.task_id, ())
                     ):
                         rejection_reasons[task.task_id].append(
-                            f'{uav.uav_id}: task goal is outside operating '
-                            'bounds'
+                            f'{uav.uav_id}: task goal is outside operating bounds'
                         )
                         continue
                     eligible, reason = self._eligible(uav)
                     if not eligible:
-                        rejection_reasons[task.task_id].append(
-                            f'{uav.uav_id}: {reason}'
-                        )
+                        rejection_reasons[task.task_id].append(f'{uav.uav_id}: {reason}')
                         continue
 
                     home = landing_homes.get(uav.uav_id)
@@ -182,9 +174,7 @@ class AuctionAllocator:
 
                     candidate_route = list(routes[uav.uav_id])
                     candidate_route.append(task)
-                    if self._conflicts_with_other_routes(
-                        task, routes, uav.uav_id
-                    ):
+                    if self._conflicts_with_other_routes(task, routes, uav.uav_id):
                         rejection_reasons[task.task_id].append(
                             f'{uav.uav_id}: task is too close to another '
                             'UAV route'
@@ -203,12 +193,10 @@ class AuctionAllocator:
                         )
                         continue
                     old_metrics = self._route_metrics(
-                        uav, routes[uav.uav_id], home
-                    )
+                        uav, routes[uav.uav_id], home)
                     if old_metrics is None:
                         rejection_reasons[task.task_id].append(
-                            f'{uav.uav_id}: existing route estimate is '
-                            'unavailable'
+                            f'{uav.uav_id}: existing route estimate is unavailable'
                         )
                         continue
                     remaining = [
@@ -223,23 +211,15 @@ class AuctionAllocator:
                         uav, task, metrics, old_metrics,
                         future_penalty=future_penalty,
                     )
-                    candidates.append((
+                    candidates.append(
                         marginal['cost'], task.task_id, uav.uav_id,
-                        max(
-                            0.0,
-                            metrics['outbound_distance_m']
-                            - old_metrics['outbound_distance_m'],
-                        ),
+                        max(0.0,metrics['outbound_distance_m'] - old_metrics['outbound_distance_m']),
                         metrics['return_distance_m'], candidate_route,
-                        task,
-                    ))
+                        task)
 
             if not candidates:
                 break
-            (
-                bid, _, selected_uav_id, outbound, return_distance, route,
-                selected_task,
-            ) = min(candidates, key=lambda candidate: (
+            (bid, _, selected_uav_id, outbound, return_distance, route, selected_task) = min(candidates, key=lambda candidate: (
                 candidate[0], candidate[1], candidate[2]
             ))
             assigned_task_ids.add(selected_task.task_id)
@@ -290,7 +270,7 @@ class AuctionAllocator:
     def _route_metrics(self, uav, route, home):
         position = uav.position
         outbound_distance = 0.0
-        inspection_duration = 0.0
+        inspection_duration = 0.0  
         for index, task in enumerate(route):
             current_inspection = (
                 index == 0
@@ -304,20 +284,14 @@ class AuctionAllocator:
                 # the task's target position is only a planned waypoint and
                 # may differ slightly from the UAV's actual position.
                 leg_distance = 0.0
-                task_duration = max(
-                    0.0, float(uav.remaining_inspection_sec)
-                )
+                task_duration = max(0.0, float(uav.remaining_inspection_sec))
             else:
                 leg_distance = self.path_cost.estimate_distance(
                     position, task.target_position,
                     uav.yaw if position == uav.position else 0.0, 0.0,
                 )
                 task_duration = float(task.estimated_duration_sec)
-            if (
-                leg_distance is None
-                or not math.isfinite(leg_distance)
-                or leg_distance < 0.0
-            ):
+            if (leg_distance is None):
                 return None
             outbound_distance += leg_distance
             inspection_duration += task_duration
@@ -346,8 +320,7 @@ class AuctionAllocator:
                 'distance': leg,
                 'energy': energy,
                 'margin': (
-                    remaining
-                    - self.post_landing_reserve_percentage
+                    remaining - self.post_landing_reserve_percentage
                 ),
             }
 
@@ -407,9 +380,7 @@ class AuctionAllocator:
             'battery reserve makes both UGV and base return unsafe',
         )
 
-    def _marginal_cost(
-        self, uav, task, metrics, old_metrics, future_penalty=0.0
-    ):
+    def _marginal_cost(self, uav, task, metrics, old_metrics, future_penalty=0.0):
         marginal_distance = max(
             0.0,
             metrics['outbound_distance_m']
@@ -417,27 +388,15 @@ class AuctionAllocator:
             - old_metrics['outbound_distance_m']
             - old_metrics['return_distance_m'],
         )
-        marginal_time = max(
-            0.0,
-            metrics['workload_sec'] - old_metrics['workload_sec'],
-        )
-        marginal_energy = max(
-            0.0,
-            metrics['energy_percentage']
-            - old_metrics['energy_percentage'],
-        )
+        marginal_time = max(0.0, metrics['workload_sec'] - old_metrics['workload_sec'],)
+        marginal_energy = max(0.0, metrics['energy_percentage'] - old_metrics['energy_percentage'],)
         remaining_after_route = (
-            uav.battery_percentage
-            - metrics['energy_percentage']
+            uav.battery_percentage - metrics['energy_percentage']
             - self.battery_feasibility.minimum_reserve_percentage
         )
-        battery_margin = max(self.battery_warning_margin_percentage, 1.0)
-        battery_penalty = max(
-            0.0,
-            (battery_margin - remaining_after_route) / battery_margin,
-        )
-        workload_penalty = max(
-            0.0,
+        battery_margin = max(self.battery_warning_margin_percentage, 10.0)
+        battery_penalty = max(0.0, (battery_margin - remaining_after_route) / battery_margin)
+        workload_penalty = max(0.0,
             metrics['workload_sec'] / max(self.maximum_workload_sec, 1.0)
             - self.workload_warning_sec / max(self.maximum_workload_sec, 1.0),
         )
@@ -566,7 +525,6 @@ class AuctionAllocator:
             and math.isfinite(task.estimated_duration_sec)
             and task.estimated_duration_sec >= 0.0
         )
-
 
 def allocator_from_config(config):
     if 'allocator' in config:
