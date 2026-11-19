@@ -25,6 +25,7 @@ class InspectionTask:
     target_position: Position
     priority: int
     estimated_duration_sec: float
+    
 @dataclass(frozen=True)
 class UavSnapshot:
     uav_id: str
@@ -39,6 +40,7 @@ class UavSnapshot:
     queued_tasks: tuple[InspectionTask, ...] = ()
     current_task_inspecting: bool = False
     remaining_inspection_sec: float = 0.0
+    
 @dataclass(frozen=True)
 class AllocationDecision:
     task_id: str
@@ -47,6 +49,7 @@ class AllocationDecision:
     reason: str
     outbound_distance_m: float | None = None
     return_distance_m: float | None = None
+    
 @dataclass
 class UavTelemetry:
     state: UAVState | None = None
@@ -62,9 +65,9 @@ class AuctionAllocator:
     def __init__(
         self,
         path_cost, workload_estimator, battery_feasibility, cost_function, state_timeout_sec,
-        planning_batch_size=4, maximum_workload_sec=1800.0, workload_warning_sec=900.0, battery_warning_margin_percentage=15.0,
-        future_lookahead_tasks=3, minimum_separation_m=3.0, recovery_position=None, landing_energy_percentage=2.0, landing_altitude_m=0.2,
-        post_landing_reserve_percentage=None, cruise_altitude_m=7.0,):
+        planning_batch_size=4, maximum_workload_sec=1800.0, workload_warning_sec=900.0, battery_warning_margin_percentage=30.0,
+        future_lookahead_tasks=3, minimum_separation_m=3.0, recovery_position=None, landing_energy_percentage=5.0, landing_altitude_m=0.2,
+        post_landing_reserve_percentage=None, cruise_altitude_m=7.0):
         if state_timeout_sec <= 0.0:
             raise ValueError('State timeout must be greater than zero')
         self.path_cost = path_cost
