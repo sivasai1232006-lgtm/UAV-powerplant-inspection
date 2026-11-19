@@ -1,14 +1,12 @@
 from dataclasses import dataclass
 import math
 
-
 @dataclass(frozen=True)
 class WorkloadEstimate:
     outbound_travel_sec: float
     inspection_sec: float
     total_task_sec: float
     return_travel_sec: float
-
 
 class WorkloadEstimator:
     def __init__(self, nominal_speed_mps):
