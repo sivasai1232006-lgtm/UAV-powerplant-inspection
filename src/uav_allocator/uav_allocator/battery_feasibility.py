@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 import math
 
-
 @dataclass(frozen=True)
 class FeasibilityResult:
     feasible: bool
@@ -9,15 +8,11 @@ class FeasibilityResult:
     available_percentage: float
     reason: str
 
-
 class BatteryFeasibility:
-    def __init__(
-        self,
-        consumption_per_meter,
-        inspection_consumption_per_minute,
-        minimum_reserve_percentage,
-        landing_energy_percentage=2.0,
-    ):
+    def __init__(self, consumption_per_meter, 
+                 inspection_consumption_per_minute,
+                 minimum_reserve_percentage,
+                 landing_energy_percentage=2.0):
         values = (
             consumption_per_meter,
             inspection_consumption_per_minute,
@@ -29,12 +24,8 @@ class BatteryFeasibility:
         if minimum_reserve_percentage > 100.0:
             raise ValueError('Battery reserve cannot exceed 100 percent')
         self.consumption_per_meter = float(consumption_per_meter)
-        self.inspection_consumption_per_minute = float(
-            inspection_consumption_per_minute
-        )
-        self.minimum_reserve_percentage = float(
-            minimum_reserve_percentage
-        )
+        self.inspection_consumption_per_minute = float(inspection_consumption_per_minute)
+        self.minimum_reserve_percentage = float(minimum_reserve_percentage)
         self.landing_energy_percentage = float(landing_energy_percentage)
 
     def evaluate(
