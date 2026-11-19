@@ -12,7 +12,7 @@
     planning_batch_size: 4
     maximum_workload_sec: 1800.0
     workload_warning_sec: 900.0
-    battery_warning_margin_percentage: 15.0
+    battery_warning_margin_percentage: 30.0
     future_lookahead_tasks: 3
     minimum_separation_m: 3.0
     distance_safety_factor: 1.3
