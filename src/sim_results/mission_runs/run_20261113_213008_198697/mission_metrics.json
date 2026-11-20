@@ -1,0 +1,256 @@
+{
+  "inspection_completion_time_sec": null,
+  "inspection_time_sec": 0.0,
+  "mission_failed_reasons": {},
+  "mission_status": "INCOMPLETE",
+  "mission_time_sec": 25.372,
+  "navigation_failures": 0,
+  "planned_distance_m": 115.93303942764757,
+  "planning_time_sec": 0.1463111760058382,
+  "replan_count": 2,
+  "return_distance_m": 0.0,
+  "run_status": "INTERRUPTED",
+  "saved_at_utc": "2026-11-13T21:30:08.198630+00:00",
+  "schema_version": 1,
+  "started_at_utc": "2026-11-13T21:29:42.826775+00:00",
+  "task_counts": {
+    "cancelled": 0,
+    "completed": 0,
+    "failed": 0,
+    "total": 17,
+    "unfinished": 17
+  },
+  "tasks": [
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 10.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "UNASSIGNED",
+      "task_id": "TRANFORMER",
+      "x_m": 4.0,
+      "y_m": 20.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 7.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "UNASSIGNED",
+      "task_id": "TRANFORMER_2",
+      "x_m": -1.0,
+      "y_m": 20.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "uav_1",
+      "estimated_duration_sec": 15.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "ASSIGNED",
+      "task_id": "POWER_CELLS",
+      "x_m": -15.0,
+      "y_m": 20.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 8.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "UNASSIGNED",
+      "task_id": "POWER_CELLS_2",
+      "x_m": -21.0,
+      "y_m": 20.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 12.0,
+      "failure_reason": "",
+      "priority": 2,
+      "status": "UNASSIGNED",
+      "task_id": "BUILDING_NORTH_VIEW",
+      "x_m": -12.0,
+      "y_m": 35.0,
+      "z_m": 7.0
+    },
+    {
+      "assigned_uav": "uav_2",
+      "estimated_duration_sec": 8.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "ASSIGNED",
+      "task_id": "POWER_GENERATOR",
+      "x_m": 6.0,
+      "y_m": -30.0,
+      "z_m": 3.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 5.0,
+      "failure_reason": "",
+      "priority": 1,
+      "status": "RESERVED",
+      "task_id": "POWER_GENERATOR_2",
+      "x_m": 6.0,
+      "y_m": -25.0,
+      "z_m": 3.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 6.0,
+      "failure_reason": "",
+      "priority": 3,
+      "status": "UNASSIGNED",
+      "task_id": "POLES",
+      "x_m": -28.0,
+      "y_m": -10.0,
+      "z_m": 7.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 10.0,
+      "failure_reason": "",
+      "priority": 4,
+      "status": "UNASSIGNED",
+      "task_id": "OPEN_AREA",
+      "x_m": -25.0,
+      "y_m": -55.0,
+      "z_m": 7.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 5.0,
+      "failure_reason": "",
+      "priority": 2,
+      "status": "UNASSIGNED",
+      "task_id": "MIDDLE_LINE",
+      "x_m": -3.0,
+      "y_m": -60.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 5.0,
+      "failure_reason": "",
+      "priority": 2,
+      "status": "UNASSIGNED",
+      "task_id": "MIDDLE_LINE_2",
+      "x_m": -3.0,
+      "y_m": -25.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 5.0,
+      "failure_reason": "",
+      "priority": 2,
+      "status": "UNASSIGNED",
+      "task_id": "MIDDLE_LINE_3",
+      "x_m": -3.0,
+      "y_m": -50.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 10.0,
+      "failure_reason": "",
+      "priority": 3,
+      "status": "UNASSIGNED",
+      "task_id": "BUILDING_WEST_VIEW",
+      "x_m": -27.5,
+      "y_m": 45.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 7.0,
+      "failure_reason": "",
+      "priority": 3,
+      "status": "UNASSIGNED",
+      "task_id": "BUILDING_SOUTH_VIEW",
+      "x_m": 5.5,
+      "y_m": 45.0,
+      "z_m": 5.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 10.0,
+      "failure_reason": "",
+      "priority": 4,
+      "status": "UNASSIGNED",
+      "task_id": "PLANT_EAST_VIEW",
+      "x_m": 0.5,
+      "y_m": -65.0,
+      "z_m": 7.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 15.0,
+      "failure_reason": "",
+      "priority": 2,
+      "status": "UNASSIGNED",
+      "task_id": "CHIMNEY",
+      "x_m": 4.0,
+      "y_m": 55.0,
+      "z_m": 10.0
+    },
+    {
+      "assigned_uav": "",
+      "estimated_duration_sec": 15.0,
+      "failure_reason": "",
+      "priority": 3,
+      "status": "UNASSIGNED",
+      "task_id": "BUILDING_BACK_SIDE",
+      "x_m": -23.0,
+      "y_m": 55.0,
+      "z_m": 5.0
+    }
+  ],
+  "total_distance_m": 24.64195464885446,
+  "travel_time_sec": 41.40107408399854,
+  "uavs": {
+    "uav_1": {
+      "distance_m": 12.91585378937545,
+      "energy_consumed_wh": 0.0,
+      "final_battery_percent": 61.56911849975586,
+      "final_estimated_battery_percent": 29.35999631881714,
+      "final_position_m": [
+        -5.427859951363729,
+        6.725657634650068,
+        4.9948109243173295
+      ],
+      "initial_battery_percent": 99.99465942382812,
+      "initial_estimated_battery_percent": 30.000001192092896,
+      "return_failure_reason": "",
+      "return_status": "NOT_RETURNED",
+      "takeoff_position_m": [
+        -5.006701584936152,
+        0.007840207337383956,
+        0.218513017691568
+      ]
+    },
+    "uav_2": {
+      "distance_m": 11.72610085947901,
+      "energy_consumed_wh": 0.0,
+      "final_battery_percent": 61.85579299926758,
+      "final_estimated_battery_percent": 99.41888451576233,
+      "final_position_m": [
+        7.970986401327259,
+        -7.868103010197203,
+        3.003481472528534
+      ],
+      "initial_battery_percent": 99.99465942382812,
+      "initial_estimated_battery_percent": 100.0,
+      "return_failure_reason": "",
+      "return_status": "NOT_RETURNED",
+      "takeoff_position_m": [
+        5.020715759512907,
+        -0.021355771105625213,
+        0.23892473474913964
+      ]
+    }
+  }
+}

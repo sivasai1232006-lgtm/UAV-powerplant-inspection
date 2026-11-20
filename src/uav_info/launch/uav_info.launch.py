@@ -1,9 +1,9 @@
+
 import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
-
 
 def generate_launch_description():
     config_path = os.path.join(
@@ -16,6 +16,14 @@ def generate_launch_description():
         'config',
         'coordinate_frames.yaml',
     )
+
+    # Define initial battery percentages separately
+    battery_levels = {
+        'uav_1': 30.0,
+        'uav_2': 100.0,
+    }
+
+    uav_ids = ('uav_1', 'uav_2')
 
     nodes = [
         Node(
@@ -30,13 +38,15 @@ def generate_launch_description():
                     'uav.id': uav_id,
                     'frames.local': f'{uav_id}/odom',
                     'frames.body': f'{uav_id}/base_link',
+                    'battery.initial_percentage': battery_levels[uav_id],
                     'use_sim_time': True,
                 },
             ],
             output='screen',
         )
-        for uav_id in ('uav_1', 'uav_2')
+        for uav_id in uav_ids
     ]
+
     nodes.extend(
         Node(
             package='uav_info',
@@ -45,7 +55,7 @@ def generate_launch_description():
             parameters=[{'uav_id': uav_id}],
             output='screen',
         )
-        for uav_id in ('uav_1', 'uav_2')
+        for uav_id in uav_ids
     )
 
     return LaunchDescription(nodes)
