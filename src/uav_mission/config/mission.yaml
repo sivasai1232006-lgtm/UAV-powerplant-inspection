@@ -1,4 +1,3 @@
-
 mission:
   name: powerplant_inspection
   frame_id: map
@@ -29,14 +28,14 @@ mission:
   recovery:
     low_battery_threshold_percent: 30.0
     post_landing_reserve_percent: 10.0
-    battery_consumption_per_meter: 0.05
+    battery_consumption_per_meter: 0.01
     inspection_consumption_per_minute: 0.25
     distance_safety_factor: 1.3
-    landing_energy_percentage: 2.0
+    landing_energy_percentage: 5.0
     landing_altitude_m: 0.2
     landing_timeout_sec: 30.0
     ugv_frame_id: map
-    ugv_location: [-5.0, 0.0, 0.2]
+    ugv_location: [-3.0, 20.0, 1.2]
 
   navigation:
     maximum_retries: 5
@@ -55,17 +54,18 @@ mission:
       priority: 1
       estimated_duration_s: 10.0
 
+    - id: POWER_CELLS
+      type: inspection
+      waypoint: [-15.0, 20.0, 5.0]
+      priority: 1
+      estimated_duration_s: 15.0
+
     - id: TRANFORMER_2
       type: inspection
       waypoint: [-1, 20.0, 5.0]
       priority: 1
       estimated_duration_s: 7.0
 
-    - id: POWER_CELLS
-      type: inspection
-      waypoint: [-15.0, 20.0, 5.0]
-      priority: 1
-      estimated_duration_s: 15.0
 
     - id: POWER_CELLS_2
       type: inspection
@@ -151,20 +151,20 @@ mission:
       priority: 3
       estimated_duration_s: 15.0
 
-    - id: BUILDING_TOP_VIEW
-      type: inspection
-      waypoint: [0.0, 40.0, 10.0]
-      priority: 2
-      estimated_duration_s: 10.0
+    # - id: BUILDING_TOP_VIEW
+    #   type: inspection
+    #   waypoint: [0.0, 40.0, 10.0]
+    #   priority: 2
+    #   estimated_duration_s: 10.0
 
-    - id: BUILDING_FRONT_AREA
-      type: inspection
-      waypoint: [-20.0, 38.0, 7.0]
-      priority: 2
-      estimated_duration_s: 5.0
+    # - id: BUILDING_FRONT_AREA
+    #   type: inspection
+    #   waypoint: [-20.0, 38.0, 7.0]
+    #   priority: 2
+    #   estimated_duration_s: 5.0
 
-    - id: BUILDING_FRONT_AREA_2
-      type: inspection
-      waypoint: [3.0, 38.0, 7.0]
-      priority: 2
-      estimated_duration_s: 5.0
+    # - id: BUILDING_FRONT_AREA_2
+    #   type: inspection
+    #   waypoint: [3.0, 38.0, 7.0]
+    #   priority: 2
+    #   estimated_duration_s: 5.0

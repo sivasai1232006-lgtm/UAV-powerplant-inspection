@@ -115,7 +115,15 @@
     <include>
       <uri>model://uav_sim/models/powerplant_assembly</uri>
       <name>powerplant_assembly_1</name>
-      <pose>15 10 -2.2 0 0 1.5707963</pose>
+      <pose>15 10 -3.2 0 0 1.5707963</pose>
+    </include>
+
+    <include>
+      <pose>-3.0 20.0 1.2 0 0 0</pose>
+      <name>UGV</name>
+      <uri>
+      https://fuel.gazebosim.org/1.0/OpenRobotics/models/X2 UGV
+      </uri>
     </include>
 
     <!-- GUI camera optional -->

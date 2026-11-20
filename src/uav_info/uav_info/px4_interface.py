@@ -6,55 +6,28 @@ import rclpy
 from geometry_msgs.msg import AccelStamped, PointStamped
 from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import Odometry
-from px4_msgs.msg import (
-    BatteryStatus,
-    VehicleAttitude,
-    VehicleGlobalPosition,
-    VehicleLandDetected,
-    VehicleLocalPosition,
-    VehicleStatus,
-)
+from px4_msgs.msg import (BatteryStatus, VehicleAttitude, VehicleGlobalPosition, VehicleLandDetected, VehicleLocalPosition, VehicleStatus)
 from rclpy.node import Node
-from rclpy.qos import (
-    DurabilityPolicy,
-    HistoryPolicy,
-    QoSProfile,
-    ReliabilityPolicy,
-)
+from rclpy.qos import (DurabilityPolicy, HistoryPolicy, QoSProfile, ReliabilityPolicy,)
 from sensor_msgs.msg import BatteryState
 from std_msgs.msg import Float64, Float32
 from uav_interfaces.msg import UAVState
 from uav_interfaces.msg import TaskStatus
 from tf2_ros import StaticTransformBroadcaster, TransformBroadcaster
-
 from uav_info.altitude_monitor import AltitudeMonitor
 from uav_info.battery_monitor import BatteryMonitor
-from uav_info.coordinate_transform import (
-    gps_to_gazebo_enu,
-    local_enu_to_map_rotation,
-    local_ned_to_map,
-    local_origin_to_map,
-    multiply_quaternions,
-    ned_to_enu,
-    px4_attitude_to_enu_flu,
-    rotation_matrix_to_quaternion,
-    rotate_vector,
-)
+from uav_info.coordinate_transform import (gps_to_gazebo_enu, local_enu_to_map_rotation, local_ned_to_map, local_origin_to_map,
+    multiply_quaternions, ned_to_enu, px4_attitude_to_enu_flu, rotation_matrix_to_quaternion, rotate_vector)
 from uav_info.vehicle_health import VehicleHealth
 from uav_info.vehicle_state import VehicleState
-
 
 class PX4Interface(Node):
     def __init__(self):
         super().__init__('uav_info')
         self._declare_parameters()
-        self.uav_id = (
-            self._parameter('uav.id') or self.get_namespace().strip('/')
-        )
+        self.uav_id = (self._parameter('uav.id') or self.get_namespace().strip('/'))
         if not self.uav_id:
-            raise ValueError(
-                'Set uav.id or launch this node in a UAV namespace'
-            )
+            raise ValueError('Set uav.id or launch this node in a UAV namespace')
 
         self.world_frame = self._parameter('map.frame_id')
         self.local_frame = self._parameter('frames.local')
@@ -258,14 +231,6 @@ class PX4Interface(Node):
         self.state.update('attitude', message)
 
     def battery_callback(self, message):
-        if (
-            message.connected
-            and math.isfinite(message.remaining)
-            and 0.0 <= message.remaining <= 1.0
-        ):
-            self.battery_monitor.update_measured_percentage(
-                float(message.remaining) * 100.0
-            )
         self.state.update('battery_status', message)
 
     def vehicle_status_callback(self, message):

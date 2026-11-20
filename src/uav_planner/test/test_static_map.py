@@ -277,7 +277,14 @@ def test_static_planner_launch_connects_maps_fusers_and_both_uavs(
     launch_path = package_root / 'launch/static_planner.launch.py'
     spec = importlib.util.spec_from_file_location(
         'static_planner_launch_test', launch_path
+    )  
+    spec = importlib.util.spec_from_file_location(
+        'static_planner_launch_test', launch_path
     )
+    if spec is None:
+        raise ImportError(f"Could not create module specification: {launch_path}")
+    if spec.loader is None:
+        raise ImportError(f"Could not find module loader: {launch_path}")
     launch_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(launch_module)
     monkeypatch.setattr(

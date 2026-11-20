@@ -10,10 +10,7 @@ from uav_planner.altitude_layers import altitude_label, altitude_layers
 
 def generate_launch_description():
     share = Path(get_package_share_directory('uav_planner'))
-    with (share / 'config/static_map.yaml').open(
-        encoding='utf-8'
-    ) as config_file:
-        map_config = yaml.safe_load(config_file) or {}
+    with (share / 'config/static_map.yaml').open(encoding='utf-8') as config_file:map_config = yaml.safe_load(config_file) or {}
     layers = altitude_layers(map_config.get('flight_altitudes', ()))
     nodes = []
     for altitude, map_name, planner_name in layers:

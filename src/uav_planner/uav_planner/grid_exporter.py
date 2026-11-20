@@ -2,7 +2,6 @@ import argparse
 import json
 from pathlib import Path
 import yaml
-
 from uav_planner.altitude_layers import altitude_layers
 from uav_planner.map_generator import generate_grid
 from uav_planner.sdf_parser import load_world_collisions

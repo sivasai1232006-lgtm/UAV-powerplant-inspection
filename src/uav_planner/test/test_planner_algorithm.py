@@ -1,7 +1,5 @@
 from pathlib import Path
-
 import yaml
-
 
 def test_nav2_smac_planner_configs_use_hybrid_a_star():
     config_directory = Path(__file__).resolve().parents[1] / 'config'

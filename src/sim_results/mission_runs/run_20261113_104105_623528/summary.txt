@@ -1,0 +1,6 @@
+Mission status: INCOMPLETE
+Run status: INTERRUPTED
+Total mission time: 342.63 s
+Inspection completion time: N/A
+Tasks: 17 total, 5 completed, 1 failed, 0 cancelled, 11 unfinished
+Results: mission_metrics.json, task_results.csv
